@@ -1,0 +1,1458 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Stromverbrauch</title>
+<meta name="description" content="Stromverbrauch der Wohnung: Zählerstände, Verbrauch pro Tag, Monat und Jahr, Kosten nach Vertrag, Abschlag-Check, Vergleich mit der alten Wohnung und Rechner zum Ausprobieren.">
+<meta name="theme-color" content="#163452">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23163452'/%3E%3Cpath d='M18 4 8 18h7l-2 10 11-15h-7z' fill='%23f5c84c'/%3E%3C/svg%3E">
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f3f4f1;
+    --surface: #fcfcfb;
+    --ink: #0b0b0b;
+    --ink-2: #52514e;
+    --muted: #6d6b66;
+    --grid: #e6e5df;
+    --axis: #c3c2b7;
+    --border: rgba(11, 11, 11, 0.09);
+    --brand: #163452;
+    --brand-ink: #ffffff;
+    --brand-ink-2: rgba(255, 255, 255, 0.78);
+    --seg-bg: #ecebe6;
+    --seg-on: #ffffff;
+    --c-blau: #2a78d6;
+    --c-orange: #eb6834;
+    --c-tuerkis: #1baf7a;
+    --c-gelb: #eda100;
+    --c-violett: #6250d6;
+    --bar-neutral: #c4c2ba;
+    --bar-neutral-2: #8f8d86;
+    --good: #0ca30c;
+    --good-ink: #006300;
+    --warn: #fab219;
+    --bad-ink: #c23434;
+    --tip-bg: #ffffff;
+    --shadow: 0 1px 2px rgba(11, 11, 11, 0.04), 0 4px 16px rgba(11, 11, 11, 0.04);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --page: #0d0d0d;
+      --surface: #1a1a19;
+      --ink: #f0efec;
+      --ink-2: #c3c2b7;
+      --muted: #9a9891;
+      --grid: #2c2c2a;
+      --axis: #383835;
+      --border: rgba(255, 255, 255, 0.09);
+      --brand: #10263d;
+      --seg-bg: #262624;
+      --seg-on: #3d3d3a;
+      --c-blau: #3987e5;
+      --c-orange: #d95926;
+      --c-tuerkis: #199e70;
+      --c-gelb: #c98500;
+      --c-violett: #9085e9;
+      --bar-neutral: #4a4945;
+      --bar-neutral-2: #77756f;
+      --good-ink: #0ca30c;
+      --bad-ink: #e66767;
+      --tip-bg: #262624;
+      --shadow: none;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page: #0d0d0d;
+    --surface: #1a1a19;
+    --ink: #f0efec;
+    --ink-2: #c3c2b7;
+    --muted: #9a9891;
+    --grid: #2c2c2a;
+    --axis: #383835;
+    --border: rgba(255, 255, 255, 0.09);
+    --brand: #10263d;
+    --seg-bg: #262624;
+    --seg-on: #3d3d3a;
+    --c-blau: #3987e5;
+    --c-orange: #d95926;
+    --c-tuerkis: #199e70;
+    --c-gelb: #c98500;
+    --c-violett: #9085e9;
+    --bar-neutral: #4a4945;
+    --bar-neutral-2: #77756f;
+    --good-ink: #0ca30c;
+    --bad-ink: #e66767;
+    --tip-bg: #262624;
+    --shadow: none;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--page);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 15px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+  }
+  .wrap { max-width: 1120px; margin: 0 auto; padding-left: 16px; padding-right: 16px; }
+
+  header.top { background: var(--brand); color: var(--brand-ink); padding: 18px 0 16px; }
+  header.top .wrap { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px 16px; flex-wrap: wrap; }
+  header.top h1 { margin: 0; font-size: 21px; line-height: 1.2; font-weight: 700; letter-spacing: -0.01em; }
+  header.top p { margin: 3px 0 0; font-size: 13.5px; color: var(--brand-ink-2); }
+  header.top nav { display: flex; gap: 4px 14px; flex-wrap: wrap; font-size: 13px; }
+  header.top nav a { color: var(--brand-ink-2); text-decoration: none; }
+  header.top nav a:hover { color: var(--brand-ink); text-decoration: underline; }
+
+  main.wrap { padding-top: 16px; padding-bottom: 32px; display: grid; gap: 16px; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 16px;
+    min-width: 0;
+  }
+  .card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 4px 12px; flex-wrap: wrap; margin-bottom: 12px; }
+  .card-head h2 { margin: 0; font-size: 17px; font-weight: 650; }
+  .card-head .sub { margin: 0; color: var(--muted); font-size: 13px; }
+  .card-head.stack { display: block; }
+  .card-head.stack .sub { margin-top: 2px; }
+  .section-title { margin: 8px 0 -4px; font-size: 13px; font-weight: 650; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+
+  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 860px) { .duo { grid-template-columns: 1fr; } }
+
+  /* Kennzahlen */
+  .kpis { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+  .kpis .hero-card { grid-row: span 2; display: flex; flex-direction: column; }
+  @media (max-width: 860px) {
+    .kpis { grid-template-columns: 1fr 1fr; }
+    .kpis .hero-card { grid-column: 1 / -1; grid-row: auto; }
+  }
+  @media (max-width: 420px) { .kpis { gap: 10px; } .kpis .tile { padding: 13px; } }
+  .eyebrow { margin: 0 0 6px; font-size: 13px; color: var(--ink-2); font-weight: 550; }
+  .hero { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 8px; margin: 0 0 6px; }
+  .hero-value { font-size: 52px; font-weight: 700; line-height: 1.02; letter-spacing: -0.02em; }
+  .hero-unit { font-size: 19px; font-weight: 600; color: var(--ink-2); }
+  .hero-sub { margin: 0; color: var(--ink-2); font-size: 14px; }
+  .hero-compare { margin-top: auto; padding-top: 14px; display: grid; gap: 8px; }
+  .minis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
+  .mini { background: var(--page); border-radius: 10px; padding: 8px 10px; }
+  .mini b { display: block; font-size: 18px; font-weight: 650; line-height: 1.2; }
+  .mini b small { font-size: 12px; font-weight: 500; color: var(--ink-2); margin-left: 2px; }
+  .mini span { display: block; font-size: 12px; color: var(--muted); }
+  .cmp-row { display: grid; grid-template-columns: 128px minmax(0, 1fr) auto; align-items: center; gap: 10px; font-size: 13px; color: var(--ink-2); }
+  .cmp-row .bar { height: 8px; border-radius: 4px; background: var(--grid); position: relative; overflow: hidden; }
+  .cmp-row .bar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; }
+  .cmp-row b { font-weight: 650; color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .cmp-row .nm { display: flex; align-items: center; gap: 7px; min-width: 0; }
+  .cmp-row .nm span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tile .value { font-size: 27px; font-weight: 700; line-height: 1.1; letter-spacing: -0.01em; margin: 0 0 4px; }
+  .tile .value small { font-size: 15px; font-weight: 600; color: var(--ink-2); margin-left: 3px; }
+  .tile .note { margin: 0; font-size: 13px; color: var(--ink-2); }
+  .tile .note + .note { margin-top: 3px; }
+  .status { display: inline-flex; align-items: center; gap: 6px; font-weight: 650; }
+  .status svg { flex: none; }
+  .bad { color: var(--bad-ink); }
+  .good { color: var(--good-ink); }
+
+  /* Legende & Diagramme */
+  .legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12.5px; color: var(--ink-2); margin: -4px 0 8px; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend i { display: inline-block; width: 14px; height: 2px; border-radius: 2px; flex: none; }
+  .legend i.box { width: 10px; height: 10px; border-radius: 3px; }
+  .legend i.box.light { opacity: 0.45; }
+  .legend i.dash { background: none !important; border-top: 2px dashed currentColor; height: 0; }
+  .key { display: inline-block; width: 10px; height: 10px; border-radius: 3px; flex: none; }
+  .chart { position: relative; width: 100%; outline: none; }
+  .chart:focus-visible { box-shadow: 0 0 0 2px var(--c-blau); border-radius: 8px; }
+  .chart svg { display: block; overflow: visible; }
+  .chart text { font-family: inherit; }
+  .t-axis { font-size: 11px; fill: var(--muted); font-variant-numeric: tabular-nums; }
+  .t-lbl { font-size: 12px; fill: var(--ink-2); }
+  .t-lbl-b { font-size: 12px; fill: var(--ink); font-weight: 650; }
+  .t-val { font-size: 12px; fill: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .t-muted { font-size: 11.5px; fill: var(--muted); }
+  .gridline { stroke: var(--grid); stroke-width: 1; shape-rendering: crispEdges; }
+  .baseline { stroke: var(--axis); stroke-width: 1; shape-rendering: crispEdges; }
+  .xhair { stroke: var(--ink-2); stroke-width: 1; opacity: 0.55; pointer-events: none; }
+  .marker-line { stroke: var(--muted); stroke-width: 1; shape-rendering: crispEdges; }
+  .tip {
+    position: absolute; z-index: 5; display: none; pointer-events: none;
+    background: var(--tip-bg); color: var(--ink);
+    border: 1px solid var(--border); border-radius: 10px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.14);
+    padding: 8px 10px; font-size: 12.5px; line-height: 1.35; min-width: 150px; max-width: 280px;
+  }
+  .tip-t { color: var(--ink-2); font-size: 12px; margin-bottom: 4px; }
+  .tip-r { display: flex; align-items: center; gap: 7px; white-space: nowrap; }
+  .tip-r i { display: inline-block; width: 12px; height: 2px; border-radius: 2px; flex: none; }
+  .tip-r i.dash { background: none !important; border-top: 2px dashed; height: 0; }
+  .tip-r b { font-weight: 650; font-variant-numeric: tabular-nums; }
+  .tip-r span { color: var(--ink-2); }
+  .tip-n { color: var(--muted); font-size: 11.5px; margin-top: 4px; white-space: normal; }
+  .chart-note { margin: 8px 0 0; font-size: 12.5px; color: var(--muted); }
+
+  /* Zeilenlisten */
+  .rows { list-style: none; margin: 0; padding: 0; }
+  .rows li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 0; border-top: 1px solid var(--grid); }
+  .rows li:first-child { border-top: 0; }
+  .rows .lbl { min-width: 0; }
+  .rows .lbl .t { display: block; font-size: 14px; }
+  .rows .lbl .n { display: block; font-size: 12.5px; color: var(--muted); margin-top: 1px; }
+  .rows .val { font-size: 16px; font-weight: 650; white-space: nowrap; font-variant-numeric: tabular-nums; text-align: right; }
+  .rows .val .u { font-size: 12.5px; font-weight: 500; color: var(--ink-2); margin-left: 3px; }
+  .rows li.strong .val { font-size: 18px; }
+
+  /* Segment-Umschalter */
+  .seg { display: flex; gap: 2px; padding: 3px; background: var(--seg-bg); border-radius: 11px; margin-bottom: 12px; flex-wrap: wrap; }
+  .seg button {
+    flex: 1 1 0; min-width: max-content; border: 0; background: transparent; color: var(--ink-2);
+    font: inherit; font-size: 13px; line-height: 1.2; padding: 8px 10px; border-radius: 8px;
+    cursor: pointer; white-space: nowrap; -webkit-tap-highlight-color: transparent;
+  }
+  .seg button:hover { color: var(--ink); }
+  .seg button[aria-pressed="true"] { background: var(--seg-on); color: var(--ink); font-weight: 650; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 0 0 1px var(--border); }
+  .seg button:focus-visible { outline: 2px solid var(--c-blau); outline-offset: 1px; }
+  .seg.small button { font-size: 12.5px; padding: 6px 8px; }
+
+  /* Spielwiese */
+  .play { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 20px; }
+  @media (max-width: 860px) { .play { grid-template-columns: 1fr; } }
+  .ctrl { display: grid; gap: 14px; }
+  .ctrl-row { display: grid; gap: 4px; }
+  .ctrl-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .ctrl-top label { font-size: 14px; }
+  .ctrl-top .hint { font-size: 12px; color: var(--muted); }
+  .num { display: inline-flex; align-items: baseline; gap: 4px; }
+  .num input {
+    width: 92px; text-align: right; font: inherit; font-size: 15px; font-weight: 650; font-variant-numeric: tabular-nums;
+    color: var(--ink); background: var(--page); border: 1px solid var(--border); border-radius: 8px; padding: 4px 8px;
+  }
+  .num input:focus { outline: 2px solid var(--c-blau); outline-offset: 0; }
+  .num span { font-size: 12.5px; color: var(--ink-2); }
+  input[type="range"] { width: 100%; accent-color: var(--c-blau); margin: 2px 0; height: 26px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    border: 1px solid var(--border); background: var(--page); color: var(--ink-2); font: inherit; font-size: 12.5px;
+    padding: 5px 10px; border-radius: 999px; cursor: pointer; -webkit-tap-highlight-color: transparent;
+  }
+  .chip:hover { color: var(--ink); border-color: var(--axis); }
+  .chip[aria-pressed="true"] { background: var(--seg-on); color: var(--ink); font-weight: 650; box-shadow: 0 0 0 1px var(--ink-2) inset; }
+  .chip:focus-visible { outline: 2px solid var(--c-blau); outline-offset: 1px; }
+  .btn-link { border: 0; background: none; padding: 0; font: inherit; font-size: 13px; color: var(--c-blau); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+  .badge { display: inline-block; font-size: 11.5px; font-weight: 650; padding: 2px 8px; border-radius: 999px; background: var(--seg-bg); color: var(--ink-2); vertical-align: 2px; }
+  .badge.on { background: var(--warn); color: #0b0b0b; }
+  .out-big { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; margin: 0 0 4px; }
+  .out-big b { font-size: 34px; line-height: 1.1; font-weight: 700; letter-spacing: -0.01em; }
+  .out-big span { color: var(--ink-2); font-size: 14px; }
+  .formula { font-size: 12px; color: var(--muted); margin: 10px 0 0; }
+
+  /* Zählerscheibe */
+  .disc-wrap { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 20px; align-items: start; }
+  @media (max-width: 760px) { .disc-wrap { grid-template-columns: 1fr; } }
+  .tap {
+    width: 100%; min-height: 128px; border-radius: 16px; border: 2px dashed var(--axis); background: var(--page);
+    color: var(--ink); font: inherit; font-size: 16px; font-weight: 650; cursor: pointer; padding: 16px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+    -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none;
+  }
+  .tap small { font-weight: 450; font-size: 13px; color: var(--ink-2); }
+  .tap:active { transform: scale(0.99); }
+  .tap.running { border-style: solid; border-color: var(--c-blau); }
+  .tap:focus-visible { outline: 2px solid var(--c-blau); outline-offset: 2px; }
+  .disc-svg { display: block; margin: 0 auto 8px; }
+
+  /* Tabellen */
+  .table-wrap { overflow-x: auto; margin: 0 -16px; padding: 0 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th, td { padding: 8px 10px; text-align: right; border-bottom: 1px solid var(--grid); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  th:first-child, td:first-child { text-align: left; padding-left: 0; }
+  th { font-weight: 600; color: var(--ink-2); font-size: 12.5px; vertical-align: bottom; }
+  th small { display: block; font-weight: 450; color: var(--muted); font-size: 11.5px; }
+  td.txt, th.txt { text-align: left; white-space: normal; min-width: 180px; color: var(--ink-2); font-size: 12.5px; }
+  tr.grp td { background: var(--page); font-weight: 650; color: var(--ink); text-align: left; padding-top: 10px; padding-bottom: 10px; white-space: normal; }
+  tr.grp td .key { margin-right: 8px; vertical-align: -1px; }
+  tr.grp td span.n { font-weight: 450; color: var(--muted); margin-left: 6px; font-size: 12.5px; }
+  td.dim { color: var(--muted); }
+  @media (max-width: 640px) {
+    .opt { display: none; }
+    table { font-size: 12.5px; }
+    th, td { padding: 7px 6px; }
+  }
+
+  /* Verträge */
+  .contracts { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+  .contract { border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; background: var(--page); }
+  .contract h3 { margin: 0 0 2px; font-size: 15px; font-weight: 650; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .contract .who { margin: 0 0 8px; font-size: 12.5px; color: var(--muted); }
+  .contract dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; font-size: 13px; }
+  .contract dt { color: var(--ink-2); }
+  .contract dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+  .contract .st { margin: 8px 0 0; font-size: 12.5px; color: var(--ink-2); }
+  .pill { font-size: 11px; font-weight: 650; padding: 2px 8px; border-radius: 999px; background: var(--seg-bg); color: var(--ink-2); }
+  .pill.aktiv { background: var(--c-blau); color: #fff; }
+  .deadlines { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+  .deadline { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; padding: 7px 12px; border-radius: 10px; background: var(--page); border: 1px solid var(--border); }
+  .deadline b { font-weight: 650; }
+
+  .notes { margin: 0; padding-left: 18px; color: var(--ink-2); font-size: 13.5px; display: grid; gap: 6px; }
+  .notes b { color: var(--ink); font-weight: 600; }
+  footer { padding: 4px 0 28px; color: var(--muted); font-size: 12.5px; }
+  footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; }
+  a { color: var(--c-blau); }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div>
+      <h1>Stromverbrauch</h1>
+      <p id="stand"></p>
+    </div>
+    <nav aria-label="Abschnitte">
+      <a href="#verlauf">Verlauf</a>
+      <a href="#kosten">Kosten</a>
+      <a href="#spielwiese">Spielwiese</a>
+      <a href="#tabellen">Tabellen</a>
+      <a href="#vertraege">Verträge</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="kpis" aria-label="Kennzahlen">
+    <div class="card hero-card">
+      <p class="eyebrow" id="hero-eyebrow">Hochrechnung Jahresverbrauch</p>
+      <div class="hero"><span class="hero-value" id="hero-value">–</span><span class="hero-unit">kWh/Jahr</span></div>
+      <p class="hero-sub" id="hero-sub"></p>
+      <div class="minis" id="hero-minis"></div>
+      <div class="hero-compare" id="hero-compare"></div>
+    </div>
+    <div class="card tile">
+      <p class="eyebrow">Kosten pro Jahr</p>
+      <p class="value" id="k-kosten">–</p>
+      <p class="note" id="k-kosten-n"></p>
+    </div>
+    <div class="card tile">
+      <p class="eyebrow" id="k-abschlag-t">Abschlag-Check</p>
+      <p class="value" id="k-abschlag">–</p>
+      <p class="note" id="k-abschlag-n"></p>
+    </div>
+    <div class="card tile">
+      <p class="eyebrow" id="k-vgl-t">Vergleich alte Wohnung</p>
+      <p class="value" id="k-vgl">–</p>
+      <p class="note" id="k-vgl-n"></p>
+    </div>
+    <div class="card tile">
+      <p class="eyebrow">Letzte Ablesung</p>
+      <p class="value" id="k-last">–</p>
+      <p class="note" id="k-last-n"></p>
+    </div>
+  </section>
+
+  <section class="card" id="verlauf" aria-labelledby="h-verlauf">
+    <div class="card-head stack">
+      <h2 id="h-verlauf">Verbrauch pro Tag im Verlauf</h2>
+      <p class="sub">Ø kWh pro Tag zwischen zwei Ablesungen – alte und neue Wohnung getrennt</p>
+    </div>
+    <div class="legend" id="lg-verlauf"></div>
+    <div class="chart" id="ch-verlauf" tabindex="0" role="img" aria-label="Stufendiagramm: durchschnittlicher Verbrauch pro Tag je Ableseintervall für beide Wohnungen. Alle Werte stehen auch in der Tabelle Ablesungen."></div>
+    <p class="chart-note" id="nt-verlauf"></p>
+  </section>
+
+  <div class="duo">
+    <section class="card" aria-labelledby="h-saison">
+      <div class="card-head stack">
+        <h2 id="h-saison">Saisonvergleich</h2>
+        <p class="sub">Ø kWh pro Tag je Kalendermonat (alte Wohnung: Mittel aller Jahre)</p>
+      </div>
+      <div class="legend" id="lg-saison"></div>
+      <div class="chart" id="ch-saison" tabindex="0" role="img" aria-label="Liniendiagramm: durchschnittlicher Verbrauch pro Tag je Kalendermonat für beide Wohnungen."></div>
+      <p class="chart-note" id="nt-saison"></p>
+    </section>
+    <section class="card" aria-labelledby="h-jahre">
+      <div class="card-head stack">
+        <h2 id="h-jahre">Jahresverbrauch</h2>
+        <p class="sub">kWh pro Kalenderjahr, Teiljahre auf 365 Tage hochgerechnet</p>
+      </div>
+      <div class="legend" id="lg-jahre"></div>
+      <div class="chart" id="ch-jahre" tabindex="0" role="img" aria-label="Säulendiagramm: Jahresverbrauch je Kalenderjahr und Wohnung. Alle Werte stehen auch in der Tabelle Jahreswerte."></div>
+    </section>
+  </div>
+
+  <section class="card" id="kosten" aria-labelledby="h-kosten">
+    <div class="card-head">
+      <h2 id="h-kosten">Abrechnungsjahr durchspielen</h2>
+      <p class="sub" id="kosten-sub"></p>
+    </div>
+    <div class="play">
+      <div>
+        <div class="seg small" id="presets" role="group" aria-label="Tarif-Vorlage"></div>
+        <div class="ctrl" id="ctrl"></div>
+        <p class="formula"><span id="szenario-badge" class="badge">Vertragswerte</span> <button type="button" class="btn-link" id="btn-reset">Zurücksetzen</button></p>
+      </div>
+      <div>
+        <ul class="rows" id="out-rows"></ul>
+      </div>
+    </div>
+    <h3 class="section-title" style="margin-top:18px">Kosten und Abschläge im Abrechnungsjahr (kumuliert)</h3>
+    <div class="legend" id="lg-kosten" style="margin-top:10px"></div>
+    <div class="chart" id="ch-kosten" tabindex="0" role="img" aria-label="Liniendiagramm: kumulierte Kosten (gemessen und Prognose) und kumulierte Abschläge im Abrechnungsjahr."></div>
+    <p class="chart-note" id="nt-kosten"></p>
+  </section>
+
+  <section class="card" aria-labelledby="h-tarife">
+    <div class="card-head stack">
+      <h2 id="h-tarife">Tarifvergleich</h2>
+      <p class="sub" id="tarife-sub"></p>
+    </div>
+    <div class="chart" id="ch-tarife" role="img" aria-label="Balkendiagramm: Jahreskosten je Tarif beim gewählten Jahresverbrauch."></div>
+    <p class="chart-note" id="nt-tarife"></p>
+  </section>
+
+  <h2 class="section-title" id="spielwiese">Spielwiese</h2>
+  <div class="duo">
+    <section class="card" aria-labelledby="h-dusche">
+      <div class="card-head stack">
+        <h2 id="h-dusche">Duschen mit dem Durchlauferhitzer</h2>
+        <p class="sub">Was das warme Wasser im Jahr kostet</p>
+      </div>
+      <div class="ctrl" id="ctrl-dusche"></div>
+      <div style="margin-top:16px">
+        <div class="out-big"><b id="du-eur">–</b><span id="du-eur-n"></span></div>
+        <ul class="rows" id="du-rows"></ul>
+        <p class="formula">Energie = Liter × 4,19 kJ/(kg·K) × (Duschtemperatur − Kaltwasser) ÷ 3.600, Wirkungsgrad 98 %. Händewaschen und Abwasch kommen beim Durchlauferhitzer noch dazu.</p>
+      </div>
+    </section>
+    <section class="card" aria-labelledby="h-geraet">
+      <div class="card-head stack">
+        <h2 id="h-geraet">Was kostet ein Gerät?</h2>
+        <p class="sub">Leistung × Nutzungsdauer – zum aktuellen Arbeitspreis</p>
+      </div>
+      <div class="chips" id="geraet-chips" role="group" aria-label="Beispielgeräte" style="margin-bottom:14px"></div>
+      <div class="ctrl" id="ctrl-geraet"></div>
+      <div style="margin-top:16px">
+        <div class="out-big"><b id="ge-eur">–</b><span id="ge-eur-n"></span></div>
+        <ul class="rows" id="ge-rows"></ul>
+      </div>
+    </section>
+  </div>
+
+  <section class="card" aria-labelledby="h-disc">
+    <div class="card-head stack">
+      <h2 id="h-disc">Zählerscheibe als Leistungsmesser</h2>
+      <p class="sub" id="disc-sub"></p>
+    </div>
+    <div class="disc-wrap">
+      <div>
+        <button type="button" class="tap" id="tap"><span id="tap-t">Start: tippen, wenn die rote Markierung vorbeikommt</span><small id="tap-n">danach bei jeder weiteren Umdrehung erneut tippen</small></button>
+        <p class="formula" style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><span id="tap-info">Noch keine Messung</span><button type="button" class="btn-link" id="tap-reset">Neu starten</button></p>
+        <div class="ctrl" id="ctrl-disc" style="margin-top:6px"></div>
+      </div>
+      <div>
+        <div class="out-big"><b id="disc-w">–</b><span>Watt</span></div>
+        <ul class="rows" id="disc-rows"></ul>
+        <p class="formula" id="disc-formula"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" id="tabellen" aria-labelledby="h-abl">
+    <div class="card-head">
+      <h2 id="h-abl">Ablesungen</h2>
+      <p class="sub">neueste zuerst · Datenbasis: Excel</p>
+    </div>
+    <div class="table-wrap">
+      <table id="tb-abl">
+        <thead>
+          <tr>
+            <th scope="col">Datum</th>
+            <th scope="col">Zählerstand<small>kWh</small></th>
+            <th scope="col">Verbrauch<small>kWh</small></th>
+            <th scope="col" class="opt">Tage</th>
+            <th scope="col">Ø pro Tag<small>kWh</small></th>
+            <th scope="col">Kosten<small>€</small></th>
+            <th scope="col" class="txt opt">Quelle / Bemerkung</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="h-werte">
+    <div class="card-head">
+      <h2 id="h-werte">Monats- und Jahreswerte</h2>
+      <p class="sub">linear zwischen den Ablesungen interpoliert</p>
+    </div>
+    <div class="seg" id="seg-werte" role="group" aria-label="Tabelle wählen"></div>
+    <div class="table-wrap">
+      <table id="tb-werte"><thead></thead><tbody></tbody></table>
+    </div>
+  </section>
+
+  <section class="card" id="vertraege" aria-labelledby="h-vertraege">
+    <div class="card-head">
+      <h2 id="h-vertraege">Verträge &amp; Fristen</h2>
+      <p class="sub">Preise brutto laut Vertragsunterlagen</p>
+    </div>
+    <div class="deadlines" id="deadlines"></div>
+    <div class="contracts" id="contracts"></div>
+  </section>
+
+  <section class="card" aria-labelledby="h-hinweise">
+    <div class="card-head">
+      <h2 id="h-hinweise">Hinweise &amp; Berechnung</h2>
+    </div>
+    <ul class="notes" id="notes"></ul>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span id="foot-l"></span>
+    <span>Neue Ablesung: Foto vom Zähler in den Ordner legen</span>
+  </div>
+</footer>
+
+<script src="messwerte.js"></script>
+<script>
+(function () {
+  'use strict';
+  var D = window.STROM;
+  if (!D) { document.getElementById('stand').textContent = 'messwerte.js fehlt'; return; }
+
+  /* ---------- Formatierung ---------- */
+  var NFS = {};
+  function nf(d) { return NFS[d] || (NFS[d] = new Intl.NumberFormat('de-DE', { minimumFractionDigits: d, maximumFractionDigits: d })); }
+  function fmt(x, d) { return (x == null || !isFinite(x)) ? '–' : nf(d || 0).format(x); }
+  function fmtS(x, d) { return (x > 0 ? '+' : x < 0 ? '−' : '±') + fmt(Math.abs(x), d); }
+  function eur(x, d) { return fmt(x, d || 0) + ' €'; }
+  var DAY = 864e5;
+  function dnum(iso) { var p = iso.split('-'); return Date.UTC(+p[0], +p[1] - 1, +p[2]) / DAY; }
+  function dobj(n) { return new Date(Math.round(n) * DAY); }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function fdate(n) { var t = dobj(n); return pad(t.getUTCDate()) + '.' + pad(t.getUTCMonth() + 1) + '.' + t.getUTCFullYear(); }
+  function fdateS(n) { var t = dobj(n); return pad(t.getUTCDate()) + '.' + pad(t.getUTCMonth() + 1) + '.'; }
+  var MON = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+  var MONL = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+  function mstart(y, m) { return Date.UTC(y, m, 1) / DAY; }
+  function yearOf(n) { return dobj(n).getUTCFullYear(); }
+  function monthOf(n) { return dobj(n).getUTCMonth(); }
+  function addMonths(n, k) { var t = dobj(n), y = t.getUTCFullYear(), m = t.getUTCMonth() + k; var last = new Date(Date.UTC(y, m + 1, 0)).getUTCDate(); return Date.UTC(y, m, Math.min(t.getUTCDate(), last)) / DAY; }
+  function $(id) { return document.getElementById(id); }
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function clear(node) { while (node.firstChild) node.removeChild(node.firstChild); return node; }
+
+  /* ---------- Daten aufbereiten ---------- */
+  var FARBVAR = { blau: '--c-blau', orange: '--c-orange', 'türkis': '--c-tuerkis', gelb: '--c-gelb', violett: '--c-violett' };
+  var W = D.wohnungen.map(function (w) {
+    var r = D.ablesungen.filter(function (a) { return a.wohnung === w.name; })
+      .map(function (a) { return { t: dnum(a.datum), stand: a.stand, quelle: a.quelle, bemerkung: a.bemerkung }; })
+      .sort(function (a, b) { return a.t - b.t; });
+    return Object.assign({}, w, { r: r, col: 'var(' + (FARBVAR[w.farbe] || '--c-blau') + ')' });
+  }).filter(function (w) { return w.r.length > 0; })
+    .sort(function (a, b) { return a.r[0].t - b.r[0].t; });
+  var CUR = W[W.length - 1];
+  var PREV = W.length > 1 ? W[W.length - 2] : null;
+
+  function tarifPrep(v) { return Object.assign({}, v, { abT: v.ab ? dnum(v.ab) : null, bisT: v.bis ? dnum(v.bis) : null }); }
+  var V = D.vertraege.map(tarifPrep).sort(function (a, b) { return a.abT - b.abT; });
+  var VG = (D.vergleich || []).map(tarifPrep);
+  var AKT = V[V.length - 1];
+  function tarifAt(t) { var r = null; V.forEach(function (v) { if (v.abT <= t) r = v; }); return r; }
+
+  function intervals(w) {
+    var out = [];
+    for (var i = 1; i < w.r.length; i++) {
+      var a = w.r[i - 1], b = w.r[i], tage = b.t - a.t, kwh = b.stand - a.stand;
+      var v = tage > 0 ? tarifAt(a.t + tage / 2) : null;
+      out.push({ von: a.t, bis: b.t, tage: tage, kwh: kwh, proTag: tage > 0 ? kwh / tage : null, tarif: v,
+        kosten: v ? kwh * v.ap / 100 + tage * v.gpJahr / 365 : null, a: a, b: b });
+    }
+    return out;
+  }
+  function mergedIntervals(w) {          // Intervalle unter 3 Tagen mit dem Folgeintervall zusammenfassen
+    var out = [], start = w.r[0];
+    for (var i = 1; i < w.r.length; i++) {
+      var b = w.r[i];
+      if (b.t - start.t >= 3 || i === w.r.length - 1) {
+        var tage = b.t - start.t;
+        if (tage > 0) out.push({ von: start.t, bis: b.t, tage: tage, kwh: b.stand - start.stand, proTag: (b.stand - start.stand) / tage });
+        start = b;
+      }
+    }
+    return out;
+  }
+  function standAt(w, t) {
+    var r = w.r;
+    if (t <= r[0].t) return r[0].stand;
+    if (t >= r[r.length - 1].t) return r[r.length - 1].stand;
+    var lo = 0, hi = r.length - 1;
+    while (hi - lo > 1) { var mid = (lo + hi) >> 1; if (r[mid].t <= t) lo = mid; else hi = mid; }
+    var a = r[lo], b = r[hi];
+    return a.stand + (b.stand - a.stand) * (t - a.t) / (b.t - a.t);
+  }
+  function maxIntervalIn(w, von, bis) {
+    var m = 0;
+    for (var i = 1; i < w.r.length; i++) {
+      var a = w.r[i - 1].t, b = w.r[i].t;
+      if (b > von && a < bis) m = Math.max(m, b - a);
+    }
+    return m;
+  }
+  function months(w) {
+    var out = [], first = w.r[0].t, last = w.r[w.r.length - 1].t;
+    if (w.r.length < 2) return out;
+    var y = yearOf(first), m = monthOf(first);
+    for (;;) {
+      var ms = mstart(y, m); if (ms >= last) break;
+      var me = mstart(y, m + 1), von = Math.max(ms, first), bis = Math.min(me, last), tage = bis - von;
+      if (tage > 0) {
+        var kwh = standAt(w, bis) - standAt(w, von), v = tarifAt(von + tage / 2);
+        out.push({ w: w, y: y, m: m, ms: ms, von: von, bis: bis, tage: tage, len: me - ms, kwh: kwh, proTag: kwh / tage,
+          voll: kwh / tage * (me - ms), teil: tage < me - ms, kosten: v ? kwh * v.ap / 100 + tage * v.gpJahr / 365 : null,
+          tarif: v, grob: maxIntervalIn(w, von, bis) });
+      }
+      m++; if (m > 11) { m = 0; y++; }
+    }
+    return out;
+  }
+  function years(w) {
+    var out = [], first = w.r[0].t, last = w.r[w.r.length - 1].t, ms = months(w);
+    if (w.r.length < 2) return out;
+    for (var y = yearOf(first); y <= yearOf(last); y++) {
+      var ys = mstart(y, 0), ye = mstart(y + 1, 0), von = Math.max(ys, first), bis = Math.min(ye, last), tage = bis - von;
+      if (tage <= 0) continue;
+      var kwh = standAt(w, bis) - standAt(w, von), kosten = 0, hatKosten = false;
+      ms.forEach(function (x) { if (x.y === y && x.kosten != null) { kosten += x.kosten; hatKosten = true; } });
+      out.push({ w: w, y: y, von: von, bis: bis, tage: tage, len: ye - ys, kwh: kwh, proTag: kwh / tage, hr: kwh / tage * 365,
+        abdeckung: tage / (ye - ys), voll: tage >= ye - ys, kosten: hatKosten ? kosten : null });
+    }
+    return out;
+  }
+  function totals(w) {
+    if (!w || w.r.length < 2) return null;
+    var a = w.r[0], b = w.r[w.r.length - 1], tage = b.t - a.t, kwh = b.stand - a.stand;
+    return { von: a.t, bis: b.t, tage: tage, kwh: kwh, proTag: kwh / tage, hr: kwh / tage * 365, n: w.r.length };
+  }
+  function season(w) {
+    var agg = []; for (var i = 0; i < 12; i++) agg.push({ kwh: 0, tage: 0 });
+    months(w).forEach(function (x) { agg[x.m].kwh += x.kwh; agg[x.m].tage += x.tage; });
+    return agg;
+  }
+
+  var TOT = {}; W.forEach(function (w) { TOT[w.name] = totals(w); });
+  var TC = TOT[CUR.name], TP = PREV ? TOT[PREV.name] : null;
+  var IV_CUR = intervals(CUR);
+  var LAST = CUR.r[CUR.r.length - 1];
+
+  /* Abrechnungsjahr des aktuellen Vertrags */
+  var BJ = (function () {
+    var start = AKT.abT - 1, ende = addMonths(AKT.abT, 12) - 1;
+    var anf = standAt(CUR, start);
+    var kwhSoFar = LAST.stand - anf, tageSoFar = Math.max(0, LAST.t - start);
+    var tagMatch = /(\d{1,2})\./.exec(AKT.abschlagFaellig || ''); var tag = tagMatch ? +tagMatch[1] : 1;
+    var zahl = []; var first = Date.UTC(dobj(AKT.abT).getUTCFullYear(), dobj(AKT.abT).getUTCMonth(), tag) / DAY;
+    if (first < AKT.abT) first = addMonths(first, 1);
+    for (var k = 0; k < 12; k++) zahl.push(addMonths(first, k));
+    var pts = [{ t: start, kwh: 0 }];
+    CUR.r.forEach(function (r) { if (r.t > start && r.t <= LAST.t) pts.push({ t: r.t, kwh: r.stand - anf }); });
+    return { start: start, ende: ende, anf: anf, kwhSoFar: kwhSoFar, tageSoFar: tageSoFar, rest: Math.max(0, ende - LAST.t),
+      zahlungen: zahl, pts: pts };
+  })();
+  var BASEN = [
+    { id: 'gesamt', label: 'Ø seit ' + fdate(CUR.r[0].t), proTag: TC ? TC.proTag : null },
+    { id: 'vertrag', label: 'Ø seit Lieferbeginn', proTag: BJ.tageSoFar > 0 ? BJ.kwhSoFar / BJ.tageSoFar : null },
+    { id: 'letztes', label: 'Ø letztes Intervall', proTag: IV_CUR.length ? IV_CUR[IV_CUR.length - 1].proTag : null }
+  ];
+  if (TP) BASEN.push({ id: 'alt', label: 'Ø alte Wohnung', proTag: TP.proTag });
+  BASEN = BASEN.filter(function (b) { return b.proTag != null && isFinite(b.proTag); });
+  function prognoseKwh(proTag) { return BJ.kwhSoFar + proTag * BJ.rest; }
+  var DEF_KWH = prognoseKwh(BASEN[0].proTag);
+
+  /* ---------- SVG- und Diagramm-Helfer ---------- */
+  var NS = 'http://www.w3.org/2000/svg';
+  function s(tag, attrs, parent) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) if (attrs[k] != null) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function stext(parent, x, y, txt, cls, anchor, extra) {
+    var t = s('text', Object.assign({ x: x, y: y, class: cls || 't-axis', 'text-anchor': anchor || 'start' }, extra || {}), parent);
+    t.textContent = txt; return t;
+  }
+  function niceTicks(lo, hi, count) {
+    if (hi <= lo) hi = lo + 1;
+    var step0 = (hi - lo) / (count || 4), mag = Math.pow(10, Math.floor(Math.log10(step0))), norm = step0 / mag;
+    var step = (norm < 1.5 ? 1 : norm < 3 ? 2 : norm < 7 ? 5 : 10) * mag;
+    var a = Math.floor(lo / step) * step, b = Math.ceil(hi / step) * step, ticks = [];
+    for (var v = a; v <= b + step / 1e6; v += step) ticks.push(Math.round(v / step) * step);
+    return { lo: a, hi: b, step: step, ticks: ticks };
+  }
+  function frame(host, o) {
+    var tip = host.querySelector('.tip');
+    clear(host);
+    var w = Math.max(280, host.clientWidth || 600), h = o.height || 240;
+    var svg = s('svg', { width: w, height: h, viewBox: '0 0 ' + w + ' ' + h }, host);
+    if (!tip) tip = el('div', 'tip');
+    tip.style.display = 'none';
+    host.appendChild(tip);
+    return { svg: svg, w: w, h: h, x0: o.padL, x1: w - o.padR, y0: h - o.padB, y1: o.padT, tip: tip, host: host };
+  }
+  function gridY(F, T, ys, fmtFn) {
+    var g = s('g', {}, F.svg);
+    T.ticks.forEach(function (v) {
+      var y = Math.round(ys(v)) + 0.5;
+      s('line', { x1: F.x0, x2: F.x1, y1: y, y2: y, class: v === 0 ? 'baseline' : 'gridline' }, g);
+      stext(g, F.x0 - 7, y + 3.5, fmtFn(v), 't-axis', 'end');
+    });
+    return g;
+  }
+  function showTip(F, px, py, title, rows, note) {
+    var t = F.tip; clear(t);
+    if (title) t.appendChild(el('div', 'tip-t', title));
+    rows.forEach(function (r) {
+      var row = el('div', 'tip-r');
+      if (r.color) { var k = el('i', r.dash ? 'dash' : ''); if (r.dash) k.style.borderTopColor = r.color; else k.style.background = r.color; row.appendChild(k); }
+      row.appendChild(el('b', '', r.value));
+      if (r.label) row.appendChild(el('span', '', r.label));
+      t.appendChild(row);
+    });
+    if (note) t.appendChild(el('div', 'tip-n', note));
+    t.style.display = 'block';
+    var tw = t.offsetWidth, th = t.offsetHeight, left = px + 14;
+    if (left + tw > F.w - 2) left = px - 14 - tw;
+    if (left < 0) left = Math.max(0, Math.min(F.w - tw, px - tw / 2));
+    var top = Math.max(0, Math.min(F.h - th, py - th / 2));
+    t.style.left = left + 'px'; t.style.top = top + 'px';
+  }
+  function hideTip(F) { F.tip.style.display = 'none'; }
+  function hover(F, opts) {   // opts.items: [{x, ...}], opts.show(i) -> {title, rows, note, y}
+    var g = s('g', {}, F.svg);
+    var line = s('line', { x1: 0, x2: 0, y1: F.y1, y2: F.y0, class: 'xhair', visibility: 'hidden' }, g);
+    var hit = s('rect', { x: F.x0 - 6, y: 0, width: F.x1 - F.x0 + 12, height: F.h, fill: 'transparent' }, g);
+    var cur = -1;
+    function set(i) {
+      if (i < 0) { line.setAttribute('visibility', 'hidden'); hideTip(F); cur = -1; if (opts.onClear) opts.onClear(); return; }
+      cur = i; var it = opts.items[i];
+      if (opts.crosshair !== false) { line.setAttribute('x1', it.x); line.setAttribute('x2', it.x); line.setAttribute('visibility', 'visible'); }
+      var c = opts.show(i);
+      showTip(F, it.x, c.y != null ? c.y : (F.y1 + F.y0) / 2, c.title, c.rows, c.note);
+    }
+    function nearest(px) {
+      var best = -1, bd = 1e9;
+      opts.items.forEach(function (it, i) {
+        var d = (it.x0 != null && px >= it.x0 && px <= it.x1) ? 0 : Math.abs(it.x - px);
+        if (d < bd) { bd = d; best = i; }
+      });
+      return best;
+    }
+    hit.addEventListener('pointermove', function (e) {
+      var r = F.svg.getBoundingClientRect();
+      set(nearest((e.clientX - r.left) * F.w / r.width));
+    });
+    hit.addEventListener('pointerleave', function () { set(-1); });
+    F.host.onkeydown = function (e) {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+        e.preventDefault();
+        var i = cur < 0 ? (e.key === 'ArrowRight' ? 0 : opts.items.length - 1) : cur + (e.key === 'ArrowRight' ? 1 : -1);
+        set(Math.max(0, Math.min(opts.items.length - 1, i)));
+      } else if (e.key === 'Escape') set(-1);
+    };
+    F.host.onblur = function () { set(-1); };
+    return g;
+  }
+  function legend(id, items) {
+    var host = clear($(id));
+    items.forEach(function (it) {
+      var sp = el('span');
+      var k = el('i', it.box ? 'box' + (it.light ? ' light' : '') : (it.dash ? 'dash' : ''));
+      if (it.dash) k.style.color = it.color; else k.style.background = it.color;
+      sp.appendChild(k); sp.appendChild(document.createTextNode(it.label));
+      host.appendChild(sp);
+    });
+  }
+  function timeTicksYears(t0, t1) {
+    var out = [];
+    for (var y = yearOf(t0); y <= yearOf(t1) + 1; y++) { var t = mstart(y, 0); if (t >= t0 && t <= t1) out.push({ t: t, label: String(y) }); }
+    return out;
+  }
+
+  /* ---------- Kopf & Kennzahlen ---------- */
+  function renderKopf() {
+    $('stand').textContent = CUR.name + ' · letzte Ablesung ' + fdate(LAST.t) + ' · Zählerstand ' + fmt(LAST.stand, 1) + ' kWh';
+    $('foot-l').textContent = 'Datenbasis: ' + D.quelle + ' · erzeugt ' + D.erzeugt.split(' ')[0].split('-').reverse().join('.') + ' ' + (D.erzeugt.split(' ')[1] || '');
+  }
+  function iconWarn() {
+    var sv = s('svg', { width: 16, height: 16, viewBox: '0 0 16 16', 'aria-hidden': 'true' });
+    s('path', { d: 'M8 1.5 15 14H1z', fill: 'var(--warn)' }, sv);
+    s('path', { d: 'M8 6v4', stroke: '#0b0b0b', 'stroke-width': 1.6, 'stroke-linecap': 'round' }, sv);
+    s('circle', { cx: 8, cy: 12, r: 0.95, fill: '#0b0b0b' }, sv);
+    return sv;
+  }
+  function iconOk() {
+    var sv = s('svg', { width: 16, height: 16, viewBox: '0 0 16 16', 'aria-hidden': 'true' });
+    s('circle', { cx: 8, cy: 8, r: 7, fill: 'var(--good)' }, sv);
+    s('path', { d: 'M4.6 8.2 7 10.5l4.4-4.7', stroke: '#fff', 'stroke-width': 1.8, fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, sv);
+    return sv;
+  }
+  function renderKpis() {
+    if (!TC) return;
+    $('hero-value').textContent = fmt(TC.hr, 0);
+    $('hero-sub').textContent = 'Ø ' + fmt(TC.proTag, 2) + ' kWh pro Tag · ' + CUR.name + ' seit ' + fdate(TC.von) + ' (' + fmt(TC.tage) + ' Tage)';
+    var mn = clear($('hero-minis'));
+    [[fmt(TC.proTag, 2), 'kWh', 'pro Tag'], [fmt(TC.proTag * 365 / 12, 0), 'kWh', 'pro Monat'], [fmt(TC.proTag * 1000 / 24, 0), 'W', 'Ø Leistung']].forEach(function (x) {
+      var d = el('div', 'mini'); var b = el('b', '', x[0]); b.appendChild(el('small', '', x[1])); d.appendChild(b); d.appendChild(el('span', '', x[2])); mn.appendChild(d);
+    });
+    var cmp = clear($('hero-compare'));
+    var maxHr = Math.max.apply(null, W.map(function (w) { return TOT[w.name] ? TOT[w.name].hr : 0; }));
+    W.slice().reverse().forEach(function (w) {
+      var t = TOT[w.name]; if (!t) return;
+      var row = el('div', 'cmp-row');
+      var nm = el('span', 'nm'); var k = el('span', 'key'); k.style.background = w.col; nm.appendChild(k); nm.appendChild(el('span', '', w.name)); row.appendChild(nm);
+      var bar = el('span', 'bar'); var fill = el('i'); fill.style.width = (t.hr / maxHr * 100).toFixed(1) + '%'; fill.style.background = w.col; bar.appendChild(fill); row.appendChild(bar);
+      row.appendChild(el('b', '', fmt(t.hr, 0) + ' kWh'));
+      row.title = w.name + ': Ø ' + fmt(t.proTag, 2) + ' kWh/Tag (' + fdate(t.von) + '–' + fdate(t.bis) + ')';
+      cmp.appendChild(row);
+    });
+    // Kosten pro Jahr (Hochrechnung × aktueller Tarif)
+    var kj = AKT.gpJahr + TC.hr * AKT.ap / 100;
+    $('k-kosten').textContent = '≈ ' + eur(kj);
+    $('k-kosten-n').textContent = '≈ ' + eur(kj / 12) + ' pro Monat bei ' + fmt(TC.hr, 0) + ' kWh · ' + AKT.bezeichnung + ' (' + fmt(AKT.ap, 2) + ' ct/kWh + ' + fmt(AKT.gpJahr / 12, 2) + ' €/Monat)';
+    // Abschlag-Check
+    var pk = prognoseKwh(BASEN[0].proTag), pkost = AKT.gpJahr + pk * AKT.ap / 100, abs = 12 * (AKT.abschlag || 0), saldo = abs - pkost;
+    $('k-abschlag-t').textContent = 'Abschlag-Check ' + fdate(BJ.start + 1).slice(3) + '–' + fdate(BJ.ende).slice(3);
+    var v = clear($('k-abschlag')); var st = el('span', 'status');
+    st.appendChild(saldo < 0 ? iconWarn() : iconOk());
+    st.appendChild(document.createTextNode('≈ ' + eur(Math.abs(saldo))));
+    v.appendChild(st); var sm = el('small', '', saldo < 0 ? 'Nachzahlung' : 'Guthaben'); v.appendChild(sm);
+    $('k-abschlag-n').textContent = 'Prognose ' + eur(pkost) + ' vs. Abschläge ' + eur(abs) + ' (12 × ' + eur(AKT.abschlag) + ')' +
+      (saldo < 0 ? ' · passender Abschlag: ' + eur(Math.ceil(pkost / 12)) + '/Monat' : '');
+    // Vergleich
+    if (TP) {
+      var d = TC.proTag / TP.proTag - 1;
+      var vv = clear($('k-vgl')); var s2 = el('span', d > 0 ? 'bad' : 'good', (d > 0 ? '▲ ' : '▼ ') + fmtS(d * 100, 0) + ' %'); vv.appendChild(s2);
+      var sea = sameMonths();
+      $('k-vgl-n').textContent = fmt(TC.proTag, 2) + ' statt ' + fmt(TP.proTag, 2) + ' kWh pro Tag' +
+        (sea ? ' · gleiche Monate (' + sea.label + '): ' + fmtS(sea.delta * 100, 0) + ' %' : '');
+    } else { $('k-vgl-t').parentNode.style.display = 'none'; }
+    // Letzte Ablesung
+    $('k-last').textContent = fmt(LAST.stand, 1);
+    $('k-last').appendChild(el('small', '', 'kWh'));
+    var li = IV_CUR[IV_CUR.length - 1];
+    $('k-last-n').textContent = fdate(LAST.t) + (li ? ' · +' + fmt(li.kwh, 1) + ' kWh seit ' + fdate(li.von) + ' (' + fmt(li.proTag, 2) + ' kWh/Tag)' : '');
+  }
+  function sameMonths() {
+    if (!PREV) return null;
+    var a = season(PREV), b = season(CUR), ka = 0, ta = 0, kb = 0, tb = 0, ms = [];
+    for (var i = 0; i < 12; i++) if (a[i].tage > 0 && b[i].tage > 0) { ka += a[i].kwh; ta += a[i].tage; kb += b[i].kwh; tb += b[i].tage; ms.push(i); }
+    if (!ms.length) return null;
+    var label = ms.length === 12 ? 'ganzes Jahr' : (ms.length > 2 && ms[ms.length - 1] - ms[0] === ms.length - 1 ? MON[ms[0]] + '–' + MON[ms[ms.length - 1]] : ms.map(function (m) { return MON[m]; }).join(', '));
+    return { alt: ka / ta, neu: kb / tb, delta: (kb / tb) / (ka / ta) - 1, label: label, months: ms };
+  }
+
+  /* ---------- Diagramm: Verlauf ---------- */
+  function drawVerlauf() {
+    var host = $('ch-verlauf');
+    var F = frame(host, { height: 270, padL: 38, padR: 12, padT: 30, padB: 26 });
+    var tAll = []; W.forEach(function (w) { w.r.forEach(function (r) { tAll.push(r.t); }); });
+    var t0 = Math.min.apply(null, tAll), t1 = Math.max.apply(null, tAll), padT = (t1 - t0) * 0.012;
+    t0 -= padT; t1 += padT;
+    var xs = function (t) { return F.x0 + (t - t0) / (t1 - t0) * (F.x1 - F.x0); };
+    var steps = W.map(function (w) { return { w: w, iv: mergedIntervals(w) }; });
+    var maxV = 0; steps.forEach(function (st) { st.iv.forEach(function (i) { maxV = Math.max(maxV, i.proTag); }); });
+    var T = niceTicks(0, maxV * 1.12, 4);
+    var ys = function (v) { return F.y0 - v / T.hi * (F.y0 - F.y1); };
+    // Bänder je Wohnung
+    var gb = s('g', {}, F.svg);
+    W.forEach(function (w) {
+      var a = xs(w.r[0].t), b = xs(w.r[w.r.length - 1].t);
+      s('rect', { x: a, y: F.y1, width: Math.max(1, b - a), height: F.y0 - F.y1, fill: w.col, 'fill-opacity': 0.07 }, gb);
+    });
+    gridY(F, T, ys, function (v) { return fmt(v, 0); });
+    stext(F.svg, F.x0 - 7, F.y1 - 12, 'kWh/Tag', 't-axis', 'end');
+    // Lücken & Umzug
+    for (var i = 1; i < W.length; i++) {
+      var ga = xs(W[i - 1].r[W[i - 1].r.length - 1].t), gbx = xs(W[i].r[0].t);
+      var vs = V.filter(function (v) { return v.wohnung === W[i].name; });
+      var tu = vs.length ? vs[0].abT : W[i].r[0].t;
+      var xu = Math.round(xs(tu)) + 0.5;
+      if (gbx - xu > 112) stext(F.svg, (xu + gbx) / 2, F.y0 - 10, 'keine Ablesungen', 't-muted', 'middle');
+      else if (xu - ga > 112) stext(F.svg, (ga + xu) / 2, F.y0 - 10, 'keine Ablesungen', 't-muted', 'middle');
+      s('line', { x1: xu, x2: xu, y1: F.y1, y2: F.y0, class: 'marker-line' }, F.svg);
+      stext(F.svg, xu - 4, F.y1 + 12, 'Umzug ' + pad(monthOf(tu) + 1) + '/' + yearOf(tu), 't-muted', 'end');
+    }
+    // Achse x
+    timeTicksYears(t0, t1).forEach(function (tk) {
+      var x = Math.round(xs(tk.t)) + 0.5;
+      s('line', { x1: x, x2: x, y1: F.y0, y2: F.y0 + 4, class: 'baseline' }, F.svg);
+      stext(F.svg, x + 3, F.y0 + 17, tk.label, 't-axis', 'start');
+    });
+    // Stufen
+    var items = [];
+    steps.forEach(function (st) {
+      var d = '';
+      st.iv.forEach(function (iv, k) {
+        var xa = xs(iv.von), xb = xs(iv.bis), y = ys(iv.proTag);
+        d += (k === 0 ? 'M' : 'L') + xa.toFixed(1) + ',' + y.toFixed(1) + 'L' + xb.toFixed(1) + ',' + y.toFixed(1);
+        items.push({ x: (xa + xb) / 2, x0: xa, x1: xb, iv: iv, w: st.w, y: y });
+      });
+      s('path', { d: d, fill: 'none', stroke: st.w.col, 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }, F.svg);
+      var lastIv = st.iv[st.iv.length - 1];
+      if (lastIv) s('circle', { cx: xs(lastIv.bis), cy: ys(lastIv.proTag), r: 4, fill: st.w.col, stroke: 'var(--surface)', 'stroke-width': 2 }, F.svg);
+    });
+    // Direktbeschriftung (nur wenn Platz)
+    if (F.w >= 620) {
+      W.forEach(function (w, idx) {
+        var t = TOT[w.name]; if (!t) return;
+        var a = xs(w.r[0].t), b = xs(w.r[w.r.length - 1].t);
+        var txt = w.name + ' · Ø ' + fmt(t.proTag, 2);
+        if (idx === W.length - 1) stext(F.svg, b, F.y1 - 12, txt, 't-lbl-b', 'end');
+        else stext(F.svg, a + 2, F.y1 - 12, txt, 't-lbl-b', 'start');
+      });
+    }
+    items.sort(function (a, b) { return a.x - b.x; });
+    hover(F, {
+      items: items, crosshair: true,
+      show: function (i) {
+        var it = items[i], iv = it.iv;
+        return { y: it.y, title: fdate(iv.von) + ' – ' + fdate(iv.bis),
+          rows: [{ color: it.w.col, value: fmt(iv.proTag, 2) + ' kWh/Tag', label: it.w.name }],
+          note: fmt(iv.kwh, 1) + ' kWh in ' + fmt(iv.tage) + ' Tagen' };
+      }
+    });
+    legend('lg-verlauf', W.slice().reverse().map(function (w) { return { color: w.col, label: w.name + ' (Ø ' + fmt(TOT[w.name].proTag, 2) + ' kWh/Tag)' }; }));
+    var lang = W.some(function (w) { return mergedIntervals(w).some(function (iv) { return iv.tage > 120; }); });
+    $('nt-verlauf').textContent = (lang ? 'Lange Ableseintervalle zeigen nur den Mittelwert über den ganzen Zeitraum. ' : '') +
+      'Je öfter ein Foto vom Zähler kommt, desto feiner wird der Verlauf.';
+  }
+
+  /* ---------- Diagramm: Saison ---------- */
+  function drawSaison() {
+    var host = $('ch-saison');
+    var F = frame(host, { height: 248, padL: 34, padR: 10, padT: 26, padB: 26 });
+    var ser = W.map(function (w) { return { w: w, v: season(w).map(function (a) { return a.tage > 0 ? a.kwh / a.tage : null; }) }; });
+    var vals = []; ser.forEach(function (x) { x.v.forEach(function (v) { if (v != null) vals.push(v); }); });
+    var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
+    var T = niceTicks(Math.max(0, lo - (hi - lo) * 0.6 - 0.5), hi + (hi - lo) * 0.25 + 0.2, 4);
+    var bw = (F.x1 - F.x0) / 12;
+    var xs = function (m) { return F.x0 + bw * (m + 0.5); };
+    var ys = function (v) { return F.y0 - (v - T.lo) / (T.hi - T.lo) * (F.y0 - F.y1); };
+    gridY(F, T, ys, function (v) { return fmt(v, T.step < 1 ? 1 : 0); });
+    stext(F.svg, F.x0 - 7, F.y1 - 12, 'kWh/Tag', 't-axis', 'end');
+    var every = F.w < 420 ? 2 : 1;
+    for (var m = 0; m < 12; m++) if (m % every === 0) stext(F.svg, xs(m), F.y0 + 17, MON[m], 't-axis', 'middle');
+    ser.forEach(function (x) {
+      var d = '', pen = false;
+      x.v.forEach(function (v, m) { if (v == null) { pen = false; return; } d += (pen ? 'L' : 'M') + xs(m).toFixed(1) + ',' + ys(v).toFixed(1); pen = true; });
+      s('path', { d: d, fill: 'none', stroke: x.w.col, 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }, F.svg);
+      x.v.forEach(function (v, m) { if (v != null) s('circle', { cx: xs(m), cy: ys(v), r: 4, fill: x.w.col, stroke: 'var(--surface)', 'stroke-width': 2 }, F.svg); });
+    });
+    var items = []; for (var mm = 0; mm < 12; mm++) items.push({ x: xs(mm), m: mm });
+    hover(F, {
+      items: items,
+      show: function (i) {
+        var rows = [], vs = [];
+        ser.slice().reverse().forEach(function (x) { var v = x.v[i]; vs.push(v); rows.push({ color: x.w.col, value: v == null ? '–' : fmt(v, 2) + ' kWh/Tag', label: x.w.name }); });
+        var note = (vs.length === 2 && vs[0] != null && vs[1] != null) ? 'Unterschied: ' + fmtS((vs[0] / vs[1] - 1) * 100, 0) + ' %' : null;
+        var yv = vs.filter(function (v) { return v != null; });
+        return { title: MONL[i], rows: rows, note: note, y: yv.length ? ys(Math.max.apply(null, yv)) : null };
+      }
+    });
+    legend('lg-saison', W.slice().reverse().map(function (w) { return { color: w.col, label: w.name }; }));
+    var sm = sameMonths();
+    $('nt-saison').textContent = sm ? 'Gleiche Monate (' + sm.label + '): ' + fmt(sm.neu, 2) + ' statt ' + fmt(sm.alt, 2) + ' kWh/Tag = ' + fmtS(sm.delta * 100, 0) + ' %.' : '';
+  }
+
+  /* ---------- Diagramm: Jahre ---------- */
+  function drawJahre() {
+    var host = $('ch-jahre');
+    var F = frame(host, { height: 248, padL: 42, padR: 8, padT: 26, padB: 26 });
+    var ys_ = []; W.forEach(function (w) { years(w).forEach(function (y) { ys_.push(y); }); });
+    var T = niceTicks(0, Math.max.apply(null, ys_.map(function (y) { return y.hr; })) * 1.12, 4);
+    var ys = function (v) { return F.y0 - v / T.hi * (F.y0 - F.y1); };
+    gridY(F, T, ys, function (v) { return fmt(v, 0); });
+    stext(F.svg, F.x0 - 7, F.y1 - 12, 'kWh', 't-axis', 'end');
+    var bw = (F.x1 - F.x0) / ys_.length, barW = Math.min(24, bw * 0.55);
+    var items = [];
+    ys_.forEach(function (y, i) {
+      var cx = F.x0 + bw * (i + 0.5), top = ys(y.hr), h = F.y0 - top, r = Math.min(4, h / 2);
+      var x = cx - barW / 2;
+      var d = 'M' + x + ',' + F.y0 + 'V' + (top + r) + 'Q' + x + ',' + top + ' ' + (x + r) + ',' + top + 'H' + (x + barW - r) +
+        'Q' + (x + barW) + ',' + top + ' ' + (x + barW) + ',' + (top + r) + 'V' + F.y0 + 'Z';
+      s('path', { d: d, fill: y.w.col, 'fill-opacity': y.voll ? 1 : 0.45 }, F.svg);
+      stext(F.svg, cx, top - 6, fmt(y.hr, 0), 't-val', 'middle');
+      stext(F.svg, cx, F.y0 + 17, y.y + (y.voll ? '' : '*'), 't-axis', 'middle');
+      items.push({ x: cx, x0: cx - bw / 2, x1: cx + bw / 2, y: y, top: top });
+    });
+    hover(F, {
+      items: items, crosshair: false,
+      show: function (i) {
+        var y = items[i].y;
+        return { y: items[i].top, title: y.y + ' · ' + y.w.name,
+          rows: [{ color: y.w.col, value: fmt(y.hr, 0) + ' kWh/Jahr', label: y.voll ? 'gemessen' : 'hochgerechnet' }],
+          note: fmt(y.kwh, 0) + ' kWh in ' + fmt(y.tage) + ' Tagen (' + fmt(y.abdeckung * 100, 0) + ' % des Jahres) · Ø ' + fmt(y.proTag, 2) + ' kWh/Tag' +
+            (y.kosten != null ? ' · Kosten ' + eur(y.kosten) : '') };
+      }
+    });
+    var lg = W.slice().reverse().map(function (w) { return { color: w.col, label: w.name, box: true }; });
+    lg.push({ color: 'var(--ink-2)', label: '* heller = Teiljahr, hochgerechnet', box: true, light: true });
+    legend('lg-jahre', lg);
+  }
+
+  /* ---------- Spielwiese: Abrechnungsjahr ---------- */
+  var SZ = { kwh: DEF_KWH, ap: AKT.ap, gp: AKT.gpJahr / 12, abs: AKT.abschlag || 0, basis: BASEN[0].id, preset: 'akt' };
+  var PRESETS = [{ id: 'akt', label: AKT.bezeichnung + ' (aktuell)', v: AKT }];
+  V.slice(0, -1).reverse().forEach(function (v, i) { PRESETS.push({ id: 'v' + i, label: v.bezeichnung + (v.bis ? ' (bis ' + fdate(v.bisT).slice(3) + ')' : ''), v: v }); });
+  VG.forEach(function (v, i) { PRESETS.push({ id: 'g' + i, label: v.bezeichnung, v: v }); });
+  var CTRL = {};
+
+  function makeSlider(host, o) {   // o: id,label,hint,min,max,step,value,unit,dec,onInput
+    var row = el('div', 'ctrl-row');
+    var top = el('div', 'ctrl-top');
+    var lab = el('label', '', o.label); lab.htmlFor = o.id + '-n';
+    var lw = el('div'); lw.appendChild(lab); if (o.hint != null) { lw.appendChild(el('div', 'hint', o.hint)); }
+    top.appendChild(lw);
+    var num = el('span', 'num'); var inp = el('input'); inp.type = 'text'; inp.inputMode = 'decimal'; inp.id = o.id + '-n';
+    num.appendChild(inp); num.appendChild(el('span', '', o.unit)); top.appendChild(num);
+    var rng = el('input'); rng.type = 'range'; rng.min = o.min; rng.max = o.max; rng.step = o.step; rng.setAttribute('aria-label', o.label);
+    row.appendChild(top); row.appendChild(rng); host.appendChild(row);
+    var api = {
+      set: function (v, silent) { rng.value = v; inp.value = fmt(v, o.dec); if (!silent) o.onInput(v); },
+      get: function () { return parseFloat(rng.value); },
+      hint: function (t) { var h = lw.querySelector('.hint'); if (h) h.textContent = t; }
+    };
+    rng.addEventListener('input', function () { inp.value = fmt(+rng.value, o.dec); o.onInput(+rng.value); });
+    function fromInput() {
+      var v = parseFloat(String(inp.value).replace(/\./g, '').replace(',', '.'));
+      if (!isFinite(v)) { inp.value = fmt(+rng.value, o.dec); return; }
+      v = Math.max(o.min, Math.min(o.max, v)); rng.value = v; inp.value = fmt(v, o.dec); o.onInput(v);
+    }
+    inp.addEventListener('change', fromInput);
+    inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') fromInput(); });
+    api.set(o.value, true);
+    return api;
+  }
+  function seg(host, items, active, onPick) {
+    clear(host);
+    var btns = items.map(function (it) {
+      var b = el('button', '', it.label); b.type = 'button'; b.setAttribute('aria-pressed', it.id === active ? 'true' : 'false');
+      b.addEventListener('click', function () { btns.forEach(function (x) { x.setAttribute('aria-pressed', 'false'); }); b.setAttribute('aria-pressed', 'true'); onPick(it.id); });
+      host.appendChild(b); return b;
+    });
+    return { set: function (id) { btns.forEach(function (b, i) { b.setAttribute('aria-pressed', items[i].id === id ? 'true' : 'false'); }); } };
+  }
+
+  function initSpielwiese() {
+    $('kosten-sub').textContent = 'Abrechnungsjahr ' + fdate(BJ.start + 1) + ' – ' + fdate(BJ.ende) + ' · Werte verschieben zum Ausprobieren';
+    var presetSeg = seg($('presets'), PRESETS.map(function (p) { return { id: p.id, label: p.label }; }), 'akt', function (id) {
+      var p = PRESETS.filter(function (x) { return x.id === id; })[0];
+      SZ.preset = id; SZ.ap = p.v.ap; SZ.gp = p.v.gpJahr / 12;
+      CTRL.ap.set(SZ.ap, true); CTRL.gp.set(SZ.gp, true);
+      if (p.v.abschlag) { SZ.abs = p.v.abschlag; CTRL.abs.set(SZ.abs, true); }
+      updateSpiel();
+    });
+    CTRL.presetSeg = presetSeg;
+    var c = clear($('ctrl'));
+    var basisRow = el('div', 'ctrl-row');
+    var bt = el('div', 'ctrl-top'); bt.appendChild(el('label', '', 'Prognose-Basis für die Restmonate')); basisRow.appendChild(bt);
+    var bseg = el('div', 'seg small'); bseg.setAttribute('role', 'group'); bseg.style.marginBottom = '0'; basisRow.appendChild(bseg);
+    c.appendChild(basisRow);
+    CTRL.basisSeg = seg(bseg, BASEN.map(function (b) { return { id: b.id, label: b.label + ' (' + fmt(b.proTag, 1) + ')' }; }), SZ.basis, function (id) {
+      SZ.basis = id; var b = BASEN.filter(function (x) { return x.id === id; })[0];
+      SZ.kwh = Math.round(prognoseKwh(b.proTag)); CTRL.kwh.set(SZ.kwh, true); updateSpiel();
+    });
+    var kmin = Math.ceil(BJ.kwhSoFar / 50) * 50;
+    CTRL.kwh = makeSlider(c, { id: 'sz-kwh', label: 'Jahresverbrauch', hint: '', min: kmin, max: Math.max(6000, Math.round(DEF_KWH * 1.8 / 100) * 100), step: 10, value: Math.round(DEF_KWH), unit: 'kWh', dec: 0,
+      onInput: function (v) { SZ.kwh = v; CTRL.basisSeg.set(null); updateSpiel(); } });
+    CTRL.ap = makeSlider(c, { id: 'sz-ap', label: 'Arbeitspreis', min: 10, max: 50, step: 0.01, value: SZ.ap, unit: 'ct/kWh', dec: 2,
+      onInput: function (v) { SZ.ap = v; SZ.preset = null; presetSeg.set(null); updateSpiel(); } });
+    CTRL.gp = makeSlider(c, { id: 'sz-gp', label: 'Grundpreis', min: 0, max: 25, step: 0.01, value: SZ.gp, unit: '€/Monat', dec: 2,
+      onInput: function (v) { SZ.gp = v; SZ.preset = null; presetSeg.set(null); updateSpiel(); } });
+    CTRL.abs = makeSlider(c, { id: 'sz-abs', label: 'Monatlicher Abschlag', min: 20, max: 150, step: 1, value: SZ.abs, unit: '€', dec: 0,
+      onInput: function (v) { SZ.abs = v; updateSpiel(); } });
+    $('btn-reset').addEventListener('click', function () {
+      SZ = { kwh: Math.round(DEF_KWH), ap: AKT.ap, gp: AKT.gpJahr / 12, abs: AKT.abschlag || 0, basis: BASEN[0].id, preset: 'akt' };
+      CTRL.kwh.set(SZ.kwh, true); CTRL.ap.set(SZ.ap, true); CTRL.gp.set(SZ.gp, true); CTRL.abs.set(SZ.abs, true);
+      CTRL.basisSeg.set(SZ.basis); presetSeg.set('akt'); updateSpiel();
+    });
+    SZ.kwh = Math.round(DEF_KWH);
+    updateSpiel();
+  }
+  function rowItem(label, note, value, unit, cls) {
+    var li = el('li', cls || '');
+    var l = el('span', 'lbl'); l.appendChild(el('span', 't', label)); if (note) l.appendChild(el('span', 'n', note));
+    var v = el('span', 'val'); if (value instanceof Node) v.appendChild(value); else v.appendChild(document.createTextNode(value));
+    if (unit) v.appendChild(el('span', 'u', unit));
+    li.appendChild(l); li.appendChild(v); return li;
+  }
+  function szenario() {
+    var kwh = Math.max(SZ.kwh, BJ.kwhSoFar), gpJ = SZ.gp * 12, kost = gpJ + kwh * SZ.ap / 100, abs = 12 * SZ.abs;
+    return { kwh: kwh, gpJ: gpJ, ap: SZ.ap, kost: kost, abs: abs, saldo: abs - kost, empf: Math.ceil(kost / 12),
+      ctEff: kost / kwh * 100, restKwh: kwh - BJ.kwhSoFar };
+  }
+  function updateSpiel() {
+    var z = szenario();
+    var geaendert = Math.abs(SZ.ap - AKT.ap) > 1e-9 || Math.abs(SZ.gp * 12 - AKT.gpJahr) > 1e-6 || Math.abs(SZ.abs - (AKT.abschlag || 0)) > 1e-9 || Math.abs(SZ.kwh - Math.round(DEF_KWH)) > 0.5;
+    var badge = $('szenario-badge'); badge.textContent = geaendert ? 'Eigenes Szenario' : 'Vertragswerte + Prognose'; badge.className = 'badge' + (geaendert ? ' on' : '');
+    var b = BASEN.filter(function (x) { return x.id === SZ.basis; })[0];
+    CTRL.kwh.hint(b ? 'gemessen ' + fmt(BJ.kwhSoFar, 0) + ' kWh + ' + fmt(BJ.rest) + ' Resttage × ' + fmt(b.proTag, 2) + ' kWh' : 'gemessen ' + fmt(BJ.kwhSoFar, 0) + ' kWh + eigene Annahme für ' + fmt(BJ.rest) + ' Resttage');
+    var ul = clear($('out-rows'));
+    ul.appendChild(rowItem('Jahreskosten', 'Grundpreis ' + eur(z.gpJ) + ' + Arbeitspreis ' + eur(z.kwh * z.ap / 100), eur(z.kost), '', 'strong'));
+    ul.appendChild(rowItem('Ø pro Monat', 'effektiv ' + fmt(z.ctEff, 1) + ' ct/kWh inkl. Grundpreis', eur(z.kost / 12, 2)));
+    ul.appendChild(rowItem('Abschläge im Jahr', '12 × ' + eur(SZ.abs), eur(z.abs)));
+    var st = el('span', 'status ' + (z.saldo < 0 ? 'bad' : 'good'));
+    st.appendChild(z.saldo < 0 ? iconWarn() : iconOk());
+    st.appendChild(document.createTextNode((z.saldo < 0 ? '−' : '+') + eur(Math.abs(z.saldo))));
+    ul.appendChild(rowItem('Erwarteter Saldo', z.saldo < 0 ? 'Nachzahlung am ' + fdate(BJ.ende) : 'Guthaben am ' + fdate(BJ.ende), st, '', 'strong'));
+    ul.appendChild(rowItem('Passender Abschlag', 'damit es am Ende aufgeht', eur(z.empf), '/Monat'));
+    var kostBis = BJ.kwhSoFar * z.ap / 100 + BJ.tageSoFar * z.gpJ / 365, absBis = BJ.tageSoFar / 365 * z.abs;
+    ul.appendChild(rowItem('Stand heute', fmt(BJ.kwhSoFar, 0) + ' kWh in ' + fmt(BJ.tageSoFar) + ' Tagen: Kosten ' + eur(kostBis) + ', Abschläge anteilig ' + eur(absBis),
+      (absBis - kostBis < 0 ? '−' : '+') + eur(Math.abs(absBis - kostBis))));
+    drawKosten(z);
+    drawTarife(z);
+  }
+
+  /* ---------- Diagramm: Kosten & Abschläge ---------- */
+  function drawKosten(z) {
+    var host = $('ch-kosten');
+    var F = frame(host, { height: 262, padL: 46, padR: F_RIGHT(), padT: 26, padB: 26 });
+    var t0 = BJ.start, t1 = BJ.ende;
+    var xs = function (t) { return F.x0 + (t - t0) / (t1 - t0) * (F.x1 - F.x0); };
+    var gpTag = z.gpJ / 365;
+    var meas = BJ.pts.map(function (p) { return { t: p.t, c: p.kwh * z.ap / 100 + (p.t - t0) * gpTag }; });
+    var lastM = meas[meas.length - 1];
+    var restTage = t1 - lastM.t, rateKwh = restTage > 0 ? z.restKwh / restTage : 0;
+    var endC = lastM.c + restTage * (rateKwh * z.ap / 100 + gpTag);
+    var maxY = Math.max(endC, z.abs) * 1.1;
+    var T = niceTicks(0, maxY, 4);
+    var ys = function (v) { return F.y0 - v / T.hi * (F.y0 - F.y1); };
+    gridY(F, T, ys, function (v) { return fmt(v, 0); });
+    stext(F.svg, F.x0 - 7, F.y1 - 12, '€', 't-axis', 'end');
+    // Monatsachse
+    var every = F.w < 520 ? 2 : 1, k = 0;
+    for (var t = mstart(yearOf(t0), monthOf(t0) + 1); t <= t1 + 1; t = addMonths(t, 1), k++) {
+      var x = Math.round(xs(t)) + 0.5;
+      s('line', { x1: x, x2: x, y1: F.y0, y2: F.y0 + 4, class: 'baseline' }, F.svg);
+      if (k % every === 0 && x < F.x1 - 10) stext(F.svg, x, F.y0 + 17, MON[monthOf(t)] + (monthOf(t) === 0 ? ' ' + String(yearOf(t)).slice(2) : ''), 't-axis', 'middle');
+    }
+    // Heute-Linie
+    var xl = Math.round(xs(lastM.t)) + 0.5;
+    s('line', { x1: xl, x2: xl, y1: F.y1, y2: F.y0, class: 'marker-line' }, F.svg);
+    stext(F.svg, xl + 4, F.y1 + 10, 'letzte Ablesung ' + fdateS(lastM.t), 't-muted', 'start');
+    // Abschläge (Stufen)
+    var d = 'M' + xs(t0) + ',' + ys(0), sum = 0, absPts = [];
+    BJ.zahlungen.forEach(function (tz) { var xx = xs(tz); d += 'L' + xx + ',' + ys(sum); sum += SZ.abs; d += 'L' + xx + ',' + ys(sum); absPts.push({ t: tz, sum: sum }); });
+    d += 'L' + xs(t1) + ',' + ys(sum);
+    s('path', { d: d, fill: 'none', stroke: 'var(--ink-2)', 'stroke-width': 2, 'stroke-linejoin': 'round' }, F.svg);
+    // Kosten gemessen
+    var dm = meas.map(function (p, i) { return (i ? 'L' : 'M') + xs(p.t).toFixed(1) + ',' + ys(p.c).toFixed(1); }).join('');
+    s('path', { d: dm, fill: 'none', stroke: 'var(--c-blau)', 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }, F.svg);
+    // Prognose
+    s('path', { d: 'M' + xs(lastM.t) + ',' + ys(lastM.c) + 'L' + xs(t1) + ',' + ys(endC), fill: 'none', stroke: 'var(--c-blau)', 'stroke-width': 2, 'stroke-dasharray': '5 4', 'stroke-linecap': 'round' }, F.svg);
+    s('circle', { cx: xs(lastM.t), cy: ys(lastM.c), r: 4, fill: 'var(--c-blau)', stroke: 'var(--surface)', 'stroke-width': 2 }, F.svg);
+    // Endbeschriftung + Lücke
+    var xe = xs(t1), yC = ys(endC), yA = ys(z.abs);
+    var lblC = 'Kosten ' + eur(endC), lblA = 'Abschläge ' + eur(z.abs);
+    var yCt = yC, yAt = yA; if (Math.abs(yCt - yAt) < 14) { if (yCt < yAt) { yCt -= 7; yAt += 7; } else { yCt += 7; yAt -= 7; } }
+    stext(F.svg, xe + 8, yCt + 4, lblC, 't-lbl-b', 'start');
+    stext(F.svg, xe + 8, yAt + 4, lblA, 't-lbl', 'start');
+    if (Math.abs(yC - yA) > 6) {
+      s('line', { x1: xe + 3, x2: xe + 3, y1: yC, y2: yA, stroke: z.saldo < 0 ? 'var(--bad-ink)' : 'var(--good-ink)', 'stroke-width': 2 }, F.svg);
+    }
+    // Hover
+    var items = [], step = Math.max(1, Math.round((t1 - t0) / 60));
+    for (var tt = t0; tt <= t1; tt += step) items.push({ x: xs(tt), t: tt });
+    if (items[items.length - 1].t !== t1) items.push({ x: xs(t1), t: t1 });
+    items.push({ x: xs(lastM.t), t: lastM.t }); items.sort(function (a, b) { return a.t - b.t; });
+    function kostenAt(t) {
+      if (t <= lastM.t) {
+        for (var i = 1; i < meas.length; i++) if (t <= meas[i].t) { var a = meas[i - 1], b = meas[i]; return { c: a.c + (b.c - a.c) * (t - a.t) / (b.t - a.t), prog: false }; }
+        return { c: meas[0].c, prog: false };
+      }
+      return { c: lastM.c + (t - lastM.t) * (rateKwh * z.ap / 100 + gpTag), prog: true };
+    }
+    function absAt(t) { var su = 0; BJ.zahlungen.forEach(function (tz) { if (tz <= t) su += SZ.abs; }); return su; }
+    hover(F, {
+      items: items,
+      show: function (i) {
+        var t = items[i].t, kc = kostenAt(t), ab = absAt(t), diff = ab - kc.c;
+        return { y: ys(Math.max(kc.c, ab)), title: fdate(t) + (kc.prog ? ' · Prognose' : ''),
+          rows: [{ color: 'var(--c-blau)', dash: kc.prog, value: eur(kc.c), label: 'Kosten' }, { color: 'var(--ink-2)', value: eur(ab), label: 'Abschläge gezahlt' }],
+          note: (diff < 0 ? 'Rückstand ' : 'Vorsprung ') + eur(Math.abs(diff)) };
+      }
+    });
+    legend('lg-kosten', [{ color: 'var(--c-blau)', label: 'Kosten gemessen' }, { color: 'var(--c-blau)', label: 'Prognose', dash: true }, { color: 'var(--ink-2)', label: 'Abschläge (fällig zum ' + (/(\d{1,2})\./.exec(AKT.abschlagFaellig || '') || ['', '1'])[1] + '.)' }]);
+    $('nt-kosten').textContent = 'Am ' + fdate(t1) + ': Kosten ≈ ' + eur(endC) + ', Abschläge ' + eur(z.abs) + ' → ' + (z.saldo < 0 ? 'Nachzahlung ≈ ' : 'Guthaben ≈ ') + eur(Math.abs(z.saldo)) + '.';
+  }
+  function F_RIGHT() { var w = $('ch-kosten').clientWidth || 600; return w < 480 ? 104 : 124; }
+
+  /* ---------- Diagramm: Tarifvergleich ---------- */
+  function drawTarife(z) {
+    var rows = [];
+    V.slice().reverse().forEach(function (v) { rows.push({ v: v, label: v.bezeichnung + (v === AKT ? ' (aktuell)' : v.bisT ? ' (bis ' + fdate(v.bisT).slice(3) + ')' : ''), akt: v === AKT }); });
+    VG.forEach(function (v) { rows.push({ v: v, label: v.bezeichnung + ' (nicht abgeschlossen)' }); });
+    var gleich = rows.some(function (r) { return Math.abs(r.v.ap - SZ.ap) < 1e-9 && Math.abs(r.v.gpJahr - SZ.gp * 12) < 1e-6; });
+    if (!gleich) rows.push({ v: { ap: SZ.ap, gpJahr: SZ.gp * 12 }, label: 'Dein Szenario (' + fmt(SZ.ap, 2) + ' ct + ' + fmt(SZ.gp, 2) + ' €/Monat)', sz: true });
+    rows.forEach(function (r) { r.kost = r.v.gpJahr + z.kwh * r.v.ap / 100; });
+    var ref = rows.filter(function (r) { return r.akt; })[0];
+    var host = $('ch-tarife'), rowH = 46;
+    var F = frame(host, { height: rows.length * rowH + 6, padL: 0, padR: 0, padT: 0, padB: 0 });
+    var maxC = Math.max.apply(null, rows.map(function (r) { return r.kost; }));
+    var valW = 128, x0 = 0, x1 = F.w - valW;
+    rows.forEach(function (r, i) {
+      var y = i * rowH;
+      stext(F.svg, 0, y + 15, r.label, r.akt ? 't-lbl-b' : 't-lbl', 'start');
+      var w = Math.max(4, (r.kost / maxC) * (x1 - x0)), by = y + 22, bh = 14;
+      var fill = r.akt ? 'var(--c-blau)' : r.sz ? 'var(--bar-neutral-2)' : 'var(--bar-neutral)';
+      s('path', { d: 'M' + x0 + ',' + by + 'H' + (x0 + w - 4) + 'Q' + (x0 + w) + ',' + by + ' ' + (x0 + w) + ',' + (by + 4) + 'V' + (by + bh - 4) + 'Q' + (x0 + w) + ',' + (by + bh) + ' ' + (x0 + w - 4) + ',' + (by + bh) + 'H' + x0 + 'Z', fill: fill }, F.svg);
+      var t = stext(F.svg, x0 + w + 8, by + 11, eur(r.kost), 't-val', 'start');
+      if (ref && !r.akt) { var ts = s('tspan', { class: 't-muted', dx: 6 }, t); ts.textContent = fmtS(r.kost - ref.kost, 0) + ' €'; }
+    });
+    $('tarife-sub').textContent = 'Jahreskosten bei ' + fmt(z.kwh, 0) + ' kWh (Verbrauch aus „Abrechnungsjahr durchspielen“)';
+    var teuer = rows.filter(function (r) { return !r.akt && !r.sz; }).sort(function (a, b) { return b.kost - a.kost; })[0];
+    $('nt-tarife').textContent = (ref && teuer && teuer.kost > ref.kost) ? 'Der Wechsel spart bei diesem Verbrauch ≈ ' + eur(teuer.kost - ref.kost) + ' pro Jahr gegenüber „' + teuer.label + '“.' : '';
+  }
+
+  /* ---------- Dusch-Rechner ---------- */
+  var DU = { min: 7, proWoche: 12, lmin: 8, kalt: 12, warm: 38 };
+  function initDusche() {
+    var c = clear($('ctrl-dusche'));
+    makeSlider(c, { id: 'du-min', label: 'Duschdauer', min: 2, max: 20, step: 0.5, value: DU.min, unit: 'min', dec: 1, onInput: function (v) { DU.min = v; updDusche(); } });
+    makeSlider(c, { id: 'du-w', label: 'Duschen pro Woche', hint: 'beide zusammen', min: 1, max: 28, step: 1, value: DU.proWoche, unit: '×', dec: 0, onInput: function (v) { DU.proWoche = v; updDusche(); } });
+    makeSlider(c, { id: 'du-l', label: 'Durchfluss', hint: 'Sparduschkopf ≈ 6, normal ≈ 9, Regendusche ≈ 12', min: 4, max: 15, step: 0.5, value: DU.lmin, unit: 'l/min', dec: 1, onInput: function (v) { DU.lmin = v; updDusche(); } });
+    makeSlider(c, { id: 'du-k', label: 'Kaltwasser', hint: 'Sommer wärmer, Winter kälter', min: 5, max: 20, step: 0.5, value: DU.kalt, unit: '°C', dec: 1, onInput: function (v) { DU.kalt = v; updDusche(); } });
+    makeSlider(c, { id: 'du-t', label: 'Duschtemperatur', min: 32, max: 45, step: 0.5, value: DU.warm, unit: '°C', dec: 1, onInput: function (v) { DU.warm = v; updDusche(); } });
+    updDusche();
+  }
+  function duKwh(o) { var liter = o.min * o.lmin; return liter * 4.19 * Math.max(0, o.warm - o.kalt) / 3600 / 0.98; }
+  function updDusche() {
+    var ap = AKT.ap / 100, proDusche = duKwh(DU), jahr = proDusche * DU.proWoche * 52.14, eurJ = jahr * ap;
+    $('du-eur').textContent = eur(eurJ);
+    $('du-eur-n').textContent = 'pro Jahr · ' + fmt(jahr, 0) + ' kWh' + (TC ? ' = ' + fmt(jahr / TC.hr * 100, 0) + ' % eures Verbrauchs' : '');
+    var ul = clear($('du-rows'));
+    ul.appendChild(rowItem('Pro Dusche', fmt(DU.min * DU.lmin, 0) + ' Liter', fmt(proDusche, 2) + ' kWh · ' + eur(proDusche * ap, 2)));
+    var kurz = Object.assign({}, DU, { min: Math.max(1, DU.min - 1) });
+    ul.appendChild(rowItem('1 Minute kürzer', 'pro Jahr', '−' + eur(eurJ - duKwh(kurz) * DU.proWoche * 52.14 * ap)));
+    if (DU.lmin > 6) { var spar = Object.assign({}, DU, { lmin: 6 }); ul.appendChild(rowItem('Sparduschkopf (6 l/min)', 'pro Jahr', '−' + eur(eurJ - duKwh(spar) * DU.proWoche * 52.14 * ap))); }
+    var kuehler = Object.assign({}, DU, { warm: DU.warm - 2 });
+    ul.appendChild(rowItem('2 °C kühler duschen', 'pro Jahr', '−' + eur(eurJ - duKwh(kuehler) * DU.proWoche * 52.14 * ap)));
+  }
+
+  /* ---------- Geräte-Rechner ---------- */
+  var GERAETE = [
+    { n: 'Kühlschrank', w: 25, h: 24, t: 7 }, { n: 'WLAN-Router', w: 10, h: 24, t: 7 }, { n: 'Fernseher', w: 80, h: 3, t: 7 },
+    { n: 'Laptop', w: 45, h: 6, t: 5 }, { n: 'PC + Monitor', w: 150, h: 4, t: 5 }, { n: 'Waschmaschine', w: 900, h: 1, t: 3 },
+    { n: 'Wasserkocher', w: 2000, h: 0.15, t: 7 }, { n: 'Föhn', w: 1800, h: 0.15, t: 7 }, { n: 'Standby gesamt', w: 15, h: 24, t: 7 }
+  ];
+  var GE = { w: 25, h: 24, t: 7 }, GC = {};
+  function initGeraet() {
+    var chips = clear($('geraet-chips'));
+    var btns = GERAETE.map(function (g) {
+      var b = el('button', 'chip', g.n); b.type = 'button'; b.setAttribute('aria-pressed', g.n === 'Kühlschrank' ? 'true' : 'false');
+      b.addEventListener('click', function () { btns.forEach(function (x) { x.setAttribute('aria-pressed', 'false'); }); b.setAttribute('aria-pressed', 'true'); GE = { w: g.w, h: g.h, t: g.t }; GC.w.set(g.w, true); GC.h.set(g.h, true); GC.t.set(g.t, true); updGeraet(); });
+      chips.appendChild(b); return b;
+    });
+    function unpick() { btns.forEach(function (x) { x.setAttribute('aria-pressed', 'false'); }); }
+    var c = clear($('ctrl-geraet'));
+    GC.w = makeSlider(c, { id: 'ge-w', label: 'Leistung', min: 1, max: 3000, step: 1, value: GE.w, unit: 'W', dec: 0, onInput: function (v) { GE.w = v; unpick(); updGeraet(); } });
+    GC.h = makeSlider(c, { id: 'ge-h', label: 'Stunden pro Nutzungstag', min: 0.05, max: 24, step: 0.05, value: GE.h, unit: 'h', dec: 2, onInput: function (v) { GE.h = v; unpick(); updGeraet(); } });
+    GC.t = makeSlider(c, { id: 'ge-t', label: 'Nutzungstage pro Woche', min: 1, max: 7, step: 1, value: GE.t, unit: 'Tage', dec: 0, onInput: function (v) { GE.t = v; unpick(); updGeraet(); } });
+    updGeraet();
+  }
+  function updGeraet() {
+    var kwhJ = GE.w * GE.h * GE.t * 52.14 / 1000, eurJ = kwhJ * AKT.ap / 100;
+    $('ge-eur').textContent = eur(eurJ);
+    $('ge-eur-n').textContent = 'pro Jahr · ' + fmt(kwhJ, kwhJ < 10 ? 1 : 0) + ' kWh';
+    var ul = clear($('ge-rows'));
+    ul.appendChild(rowItem('Pro Monat', null, eur(eurJ / 12, 2)));
+    ul.appendChild(rowItem('Pro Nutzungstag', fmt(GE.w * GE.h / 1000, 2) + ' kWh', eur(GE.w * GE.h / 1000 * AKT.ap / 100, 2)));
+    if (TC) ul.appendChild(rowItem('Anteil am Jahresverbrauch', 'bezogen auf ' + fmt(TC.hr, 0) + ' kWh', fmt(kwhJ / TC.hr * 100, 1) + ' %'));
+  }
+
+  /* ---------- Zählerscheibe ---------- */
+  var KONST = CUR.konstante || 75, TAPS = [], DISC = { sek: TC ? Math.round(3600000 / (KONST * TC.proTag * 1000 / 24)) : 120 };
+  function initDisc() {
+    $('disc-sub').textContent = (CUR.zaehlertyp || 'Ferraris-Zähler') + ': ' + KONST + ' Umdrehungen = 1 kWh. Mit der Stoppuhr die Zeit pro Umdrehung messen – das ergibt die Leistung, die gerade im ganzen Haushalt läuft.';
+    $('disc-formula').textContent = 'Leistung [W] = 3.600.000 ÷ (' + KONST + ' × Sekunden pro Umdrehung). Für die Grundlast alles ausschalten, was nicht dauerhaft läuft, dann messen.';
+    var c = clear($('ctrl-disc'));
+    DISC.slider = makeSlider(c, { id: 'disc-s', label: 'Oder Sekunden pro Umdrehung eingeben', min: 5, max: 900, step: 1, value: DISC.sek, unit: 's', dec: 0, onInput: function (v) { DISC.sek = v; TAPS = []; updTap(); updDisc(3600000 / (KONST * v), null); } });
+    $('tap').addEventListener('click', function () {
+      TAPS.push(performance.now());
+      updTap();
+    });
+    $('tap-reset').addEventListener('click', function () { TAPS = []; updTap(); updDisc(3600000 / (KONST * DISC.sek), null); });
+    updTap();
+    updDisc(3600000 / (KONST * DISC.sek), null);
+  }
+  function updTap() {
+    var n = TAPS.length, btn = $('tap');
+    btn.classList.toggle('running', n > 0);
+    if (n === 0) { $('tap-t').textContent = 'Start: tippen, wenn die rote Markierung vorbeikommt'; $('tap-n').textContent = 'danach bei jeder weiteren Umdrehung erneut tippen'; $('tap-info').textContent = 'Noch keine Messung'; return; }
+    $('tap-t').textContent = n === 1 ? 'Läuft … bei der nächsten Umdrehung tippen' : 'Umdrehung ' + (n - 1) + ' gezählt – weiter tippen';
+    $('tap-n').textContent = 'jede Umdrehung = ' + fmt(1000 / KONST, 1) + ' Wh';
+    if (n >= 2) {
+      var lap = (TAPS[n - 1] - TAPS[n - 2]) / 1000, tot = (TAPS[n - 1] - TAPS[0]) / 1000;
+      var pLap = 3600000 / (KONST * lap), pAvg = 3600000 * (n - 1) / (KONST * tot);
+      $('tap-info').textContent = (n - 1) + ' Umdrehung' + (n > 2 ? 'en' : '') + ' in ' + fmt(tot, 1) + ' s · letzte: ' + fmt(lap, 1) + ' s';
+      updDisc(pLap, n > 2 ? pAvg : null);
+    } else { $('tap-info').textContent = 'Stoppuhr läuft'; }
+  }
+  function updDisc(p, pAvg) {
+    $('disc-w').textContent = fmt(p, 0);
+    var kwhJ = p * 8760 / 1000, ul = clear($('disc-rows'));
+    if (pAvg != null) ul.appendChild(rowItem('Ø über alle Umdrehungen', null, fmt(pAvg, 0), 'W'));
+    ul.appendChild(rowItem('Wenn das dauerhaft liefe', fmt(kwhJ, 0) + ' kWh pro Jahr', eur(kwhJ * AKT.ap / 100), '/Jahr'));
+    if (TC) ul.appendChild(rowItem('Zum Vergleich: euer Ø', fmt(TC.proTag, 2) + ' kWh/Tag', fmt(TC.proTag * 1000 / 24, 0), 'W'));
+  }
+
+  /* ---------- Tabellen ---------- */
+  function td(text, cls) { return el('td', cls || '', text); }
+  function renderAblesungen() {
+    var tb = clear(document.querySelector('#tb-abl tbody'));
+    W.slice().reverse().forEach(function (w) {
+      var t = TOT[w.name];
+      var g = el('tr', 'grp'); var c = el('td'); c.colSpan = 7;
+      var k = el('span', 'key'); k.style.background = w.col; c.appendChild(k); c.appendChild(document.createTextNode(w.name));
+      c.appendChild(el('span', 'n', (w.kurz ? w.kurz + ' · ' : '') + w.zeitraum + (t ? ' · Ø ' + fmt(t.proTag, 2) + ' kWh/Tag' : '')));
+      g.appendChild(c); tb.appendChild(g);
+      var iv = intervals(w);
+      for (var i = w.r.length - 1; i >= 0; i--) {
+        var r = w.r[i], it = i > 0 ? iv[i - 1] : null, tr = el('tr');
+        tr.appendChild(td(fdate(r.t)));
+        tr.appendChild(td(fmt(r.stand, 1)));
+        tr.appendChild(td(it ? fmt(it.kwh, 1) : '–', it ? '' : 'dim'));
+        tr.appendChild(td(it ? fmt(it.tage) : '–', 'opt' + (it ? '' : ' dim')));
+        tr.appendChild(td(it && it.proTag != null ? fmt(it.proTag, 2) : '–', it ? '' : 'dim'));
+        tr.appendChild(td(it && it.kosten != null ? fmt(it.kosten, 2) : '–', it && it.kosten != null ? '' : 'dim'));
+        var txt = [r.quelle, r.bemerkung].filter(Boolean).join(' · ');
+        if (it && it.tarif) txt += (txt ? ' · ' : '') + 'Tarif ' + it.tarif.bezeichnung;
+        tr.appendChild(td(txt, 'txt opt'));
+        tb.appendChild(tr);
+      }
+    });
+  }
+  var WERTE_MODUS = 'm0';
+  function renderWerte() {
+    var opts = W.slice().reverse().map(function (w, i) { return { id: 'm' + i, label: 'Monate ' + w.name, w: w }; });
+    opts.push({ id: 'j', label: 'Jahre' });
+    seg($('seg-werte'), opts, WERTE_MODUS, function (id) { WERTE_MODUS = id; tableWerte(opts); });
+    tableWerte(opts);
+  }
+  function tableWerte(opts) {
+    var th = clear(document.querySelector('#tb-werte thead')), tb = clear(document.querySelector('#tb-werte tbody'));
+    function head(cols) { var tr = el('tr'); cols.forEach(function (c) { var h = el('th', c[2] || ''); h.scope = 'col'; h.appendChild(document.createTextNode(c[0])); if (c[1]) h.appendChild(el('small', '', c[1])); tr.appendChild(h); }); th.appendChild(tr); }
+    if (WERTE_MODUS === 'j') {
+      head([['Jahr'], ['Wohnung', null, 'txt opt'], ['Verbrauch', 'kWh erfasst'], ['Tage', 'erfasst', 'opt'], ['Ø pro Tag', 'kWh'], ['Hochrechnung', 'kWh/Jahr'], ['Kosten', '€ erfasst']]);
+      var all = []; W.forEach(function (w) { years(w).forEach(function (y) { all.push(y); }); });
+      all.reverse().forEach(function (y) {
+        var tr = el('tr');
+        var cy = el('td'); var ky = el('span', 'key'); ky.style.background = y.w.col; ky.style.marginRight = '7px'; cy.appendChild(ky); cy.appendChild(document.createTextNode(y.y + (y.voll ? '' : '*'))); tr.appendChild(cy);
+        var c = el('td', 'txt opt'); var k = el('span', 'key'); k.style.background = y.w.col; k.style.marginRight = '7px'; c.appendChild(k); c.appendChild(document.createTextNode(y.w.name)); tr.appendChild(c);
+        tr.appendChild(td(fmt(y.kwh, 0))); tr.appendChild(td(fmt(y.tage), 'opt')); tr.appendChild(td(fmt(y.proTag, 2)));
+        tr.appendChild(td(fmt(y.hr, 0))); tr.appendChild(td(y.kosten != null ? fmt(y.kosten, 2) : '–', y.kosten != null ? '' : 'dim'));
+        tb.appendChild(tr);
+      });
+      var n = el('tr'); var c2 = el('td', 'txt', '* Teiljahr – Hochrechnung = Ø pro Tag × 365'); c2.colSpan = 7; c2.style.color = 'var(--muted)'; n.appendChild(c2); tb.appendChild(n);
+      return;
+    }
+    var o = opts.filter(function (x) { return x.id === WERTE_MODUS; })[0] || opts[0];
+    head([['Monat'], ['Verbrauch', 'kWh'], ['Ø pro Tag', 'kWh'], ['voller Monat', 'kWh', 'opt'], ['Kosten', '€'], ['Hinweis', null, 'txt opt']]);
+    months(o.w).slice().reverse().forEach(function (m) {
+      var tr = el('tr');
+      tr.appendChild(td(MON[m.m] + ' ' + m.y));
+      tr.appendChild(td(fmt(m.kwh, 0))); tr.appendChild(td(fmt(m.proTag, 2))); tr.appendChild(td(fmt(m.voll, 0), 'opt'));
+      tr.appendChild(td(m.kosten != null ? fmt(m.kosten, 2) : '–', m.kosten != null ? '' : 'dim'));
+      var h = [];
+      if (m.teil) h.push('Teilmonat: ' + m.tage + ' Tage erfasst');
+      if (m.grob > 62) h.push('Mittelwert aus ' + fmt(m.grob) + '-Tage-Intervall');
+      if (m.tarif) h.push(m.tarif.bezeichnung);
+      tr.appendChild(td(h.join(' · '), 'txt opt'));
+      tb.appendChild(tr);
+    });
+  }
+
+  /* ---------- Verträge ---------- */
+  function renderVertraege() {
+    var dl = clear($('deadlines'));
+    var m = /kündbar zum (\d{2}\.\d{2}\.\d{4})/.exec(AKT.laufzeit || ''), f = /Frist (\d+) Monat/.exec(AKT.laufzeit || '');
+    function chip(color, label, val) { var d = el('span', 'deadline'); var k = el('span', 'key'); k.style.background = color; d.appendChild(k); d.appendChild(document.createTextNode(label + ' ')); d.appendChild(el('b', '', val)); dl.appendChild(d); }
+    if (m) {
+      var p = m[1].split('.'), zum = Date.UTC(+p[2], +p[1] - 1, +p[0]) / DAY;
+      var bis = f ? addMonths(zum, -(+f[1])) : null;
+      chip('var(--c-blau)', 'Kündigung zum ' + m[1] + ' möglich' + (bis ? ', spätestens am' : ''), bis ? fdate(bis) : '');
+    }
+    if (AKT.preisgarantieBis) chip('var(--bar-neutral-2)', 'Preisgarantie bis', fdate(dnum(AKT.preisgarantieBis)));
+    if (AKT.abschlag) chip('var(--bar-neutral-2)', 'Abschlag', eur(AKT.abschlag) + ' ' + (AKT.abschlagFaellig || ''));
+    var host = clear($('contracts'));
+    function card(v, art) {
+      var c = el('div', 'contract');
+      var h = el('h3'); h.appendChild(document.createTextNode(v.bezeichnung));
+      h.appendChild(el('span', 'pill' + (art === 'aktiv' ? ' aktiv' : ''), art === 'aktiv' ? 'aktiv' : art === 'alt' ? 'beendet' : 'Vergleich'));
+      c.appendChild(h);
+      c.appendChild(el('p', 'who', v.anbieter + (v.tarif && v.tarif !== v.bezeichnung ? ' · ' + v.tarif : '')));
+      var dlx = el('dl');
+      function row(a, b) { if (b == null || b === '') return; dlx.appendChild(el('dt', '', a)); dlx.appendChild(el('dd', '', b)); }
+      row('Zeitraum', v.ab ? (fdate(v.abT) + ' – ' + (v.bis ? fdate(v.bisT) : 'offen')) : null);
+      row('Arbeitspreis', fmt(v.ap, 2) + ' ct/kWh');
+      row('Grundpreis', v.gpEinheit === '€/Monat' ? fmt(v.gpAngabe, 2) + ' €/Monat (' + eur(v.gpJahr, 2) + '/Jahr)' : eur(v.gpJahr, 2) + '/Jahr (' + fmt(v.gpJahr / 12, 2) + ' €/Monat)');
+      row('Abschlag', v.abschlag ? eur(v.abschlag) + (v.abschlagFaellig ? ', ' + v.abschlagFaellig : '') : null);
+      row('Preisgarantie bis', v.preisgarantieBis ? fdate(dnum(v.preisgarantieBis)) : null);
+      c.appendChild(dlx);
+      if (v.laufzeit) c.appendChild(el('p', 'st', v.laufzeit));
+      if (v.status) c.appendChild(el('p', 'st', v.status));
+      host.appendChild(c);
+    }
+    V.slice().reverse().forEach(function (v) { card(v, v === AKT ? 'aktiv' : 'alt'); });
+    VG.forEach(function (v) { card(v, 'vergleich'); });
+  }
+
+  function renderNotes() {
+    var ul = clear($('notes'));
+    function li(b, t) { var x = el('li'); if (b) { x.appendChild(el('b', '', b + ' ')); } x.appendChild(document.createTextNode(t)); ul.appendChild(x); }
+    li('Vergleichbarkeit:', 'In beiden Wohnungen zu zweit, gleiche Geräte, Heizung über Fernwärme und Warmwasser per elektrischem Durchlauferhitzer – der Durchlauferhitzer ist meist der größte Einzelverbraucher.');
+    var lueckeCur = CUR.hinweis ? CUR.hinweis : '';
+    li('Datenlücken:', 'Zwischen ' + (PREV ? fdate(PREV.r[PREV.r.length - 1].t) : '') + ' und ' + fdate(CUR.r[0].t) + ' gibt es keine Ablesungen. ' + (lueckeCur ? lueckeCur + '.' : ''));
+    li('Verbrauch pro Tag:', 'Differenz zweier Zählerstände geteilt durch die Tage dazwischen; Hochrechnung = Ø × 365. Ableseintervalle unter 3 Tagen werden im Verlaufsdiagramm mit dem nächsten zusammengefasst.');
+    li('Monate und Jahre:', 'Zählerstände an den Monats- bzw. Jahresgrenzen werden linear zwischen den benachbarten Ablesungen interpoliert. Lange Intervalle ergeben deshalb gleichmäßige (geglättete) Monatswerte.');
+    li('Kosten:', 'Verbrauch × Arbeitspreis + Tage × Grundpreis ÷ 365, mit dem Vertrag, der zur Mitte des Zeitraums galt. Für die alte Wohnung liegen keine Vertragsdaten vor.');
+    li('Prognose:', 'Gemessener Verbrauch seit Lieferbeginn + gewählter Ø pro Tag × Resttage bis zum Ende des Abrechnungsjahres. Der Saldo vergleicht das mit 12 Abschlägen.');
+    li('Ablesen:', 'Schwarze Ziffern = volle kWh, die rote Ziffer = Zehntel. Steht eine Walze zwischen zwei Ziffern, gilt die kleinere.');
+  }
+
+  /* ---------- Start ---------- */
+  function drawCharts() { drawVerlauf(); drawSaison(); drawJahre(); updateSpiel(); }
+  renderKopf();
+  renderKpis();
+  initSpielwiese();
+  initDusche();
+  initGeraet();
+  initDisc();
+  renderAblesungen();
+  renderWerte();
+  renderVertraege();
+  renderNotes();
+  drawVerlauf(); drawSaison(); drawJahre();
+  var lastW = window.innerWidth, timer = null;
+  window.addEventListener('resize', function () {
+    if (window.innerWidth === lastW) return;
+    lastW = window.innerWidth; clearTimeout(timer); timer = setTimeout(drawCharts, 120);
+  });
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', drawCharts);
+})();
+</script>
+</body>
+</html>
