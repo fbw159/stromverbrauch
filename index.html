@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Stromverbrauch</title>
-<meta name="description" content="Stromverbrauch der Wohnung: Zählerstände, Verbrauch pro Tag, Monat und Jahr, Kosten nach Vertrag, Abschlag-Check, Vergleich mit der alten Wohnung und Rechner zum Ausprobieren.">
+<meta name="description" content="Stromverbrauch der Wohnung: Verbrauch, Kosten nach Vertrag, Abschlag-Check, Vergleich mit der alten Wohnung und Rechner zum Ausprobieren.">
 <meta name="theme-color" content="#163452">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23163452'/%3E%3Cpath d='M18 4 8 18h7l-2 10 11-15h-7z' fill='%23f5c84c'/%3E%3C/svg%3E">
 <style>
@@ -93,80 +93,107 @@
   * { box-sizing: border-box; }
   html, body { margin: 0; }
   body {
-    background: var(--page);
-    color: var(--ink);
+    background: var(--page); color: var(--ink);
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    font-size: 15px;
-    line-height: 1.45;
-    -webkit-font-smoothing: antialiased;
-    -webkit-text-size-adjust: 100%;
+    font-size: 15px; line-height: 1.45; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%;
   }
-  .wrap { max-width: 1120px; margin: 0 auto; padding-left: 16px; padding-right: 16px; }
+  a { color: var(--c-blau); }
+  svg.ic { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 
-  header.top { background: var(--brand); color: var(--brand-ink); padding: 18px 0 16px; }
-  header.top .wrap { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px 16px; flex-wrap: wrap; }
-  header.top h1 { margin: 0; font-size: 21px; line-height: 1.2; font-weight: 700; letter-spacing: -0.01em; }
-  header.top p { margin: 3px 0 0; font-size: 13.5px; color: var(--brand-ink-2); }
-  header.top nav { display: flex; gap: 4px 14px; flex-wrap: wrap; font-size: 13px; }
-  header.top nav a { color: var(--brand-ink-2); text-decoration: none; }
-  header.top nav a:hover { color: var(--brand-ink); text-decoration: underline; }
-
-  main.wrap { padding-top: 16px; padding-bottom: 32px; display: grid; gap: 16px; }
-
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    box-shadow: var(--shadow);
-    padding: 16px;
-    min-width: 0;
+  /* App-Rahmen mit Seitenmenü */
+  .app { display: grid; grid-template-columns: 232px minmax(0, 1fr); min-height: 100vh; }
+  .app.collapsed { grid-template-columns: 68px minmax(0, 1fr); }
+  .side {
+    position: sticky; top: 0; height: 100vh; overflow-y: auto; z-index: 40;
+    background: var(--brand); color: var(--brand-ink); display: flex; flex-direction: column; gap: 4px;
+    padding: 14px 10px calc(14px + env(safe-area-inset-bottom));
   }
-  .card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 4px 12px; flex-wrap: wrap; margin-bottom: 12px; }
-  .card-head h2 { margin: 0; font-size: 17px; font-weight: 650; }
-  .card-head .sub { margin: 0; color: var(--muted); font-size: 13px; }
-  .card-head.stack { display: block; }
-  .card-head.stack .sub { margin-top: 2px; }
-  .section-title { margin: 8px 0 -4px; font-size: 13px; font-weight: 650; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
-
-  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  @media (max-width: 860px) { .duo { grid-template-columns: 1fr; } }
-
-  /* Kennzahlen */
-  .kpis { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
-  .kpis .hero-card { grid-row: span 2; display: flex; flex-direction: column; }
-  @media (max-width: 860px) {
-    .kpis { grid-template-columns: 1fr 1fr; }
-    .kpis .hero-card { grid-column: 1 / -1; grid-row: auto; }
+  .side-head { display: flex; align-items: center; gap: 10px; padding: 4px 6px 14px; min-height: 48px; }
+  .logo { width: 32px; height: 32px; border-radius: 9px; background: rgba(255, 255, 255, 0.12); display: grid; place-items: center; flex: none; }
+  .brand-t { font-weight: 700; font-size: 16px; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; }
+  .icon-btn {
+    border: 0; background: transparent; color: inherit; width: 36px; height: 36px; border-radius: 9px;
+    display: inline-grid; place-items: center; cursor: pointer; flex: none; -webkit-tap-highlight-color: transparent;
   }
-  @media (max-width: 420px) { .kpis { gap: 10px; } .kpis .tile { padding: 13px; } }
+  .icon-btn:hover { background: rgba(127, 127, 127, 0.16); }
+  .icon-btn:focus-visible, .side nav a:focus-visible { outline: 2px solid #8fb8f0; outline-offset: 1px; }
+  .btn-collapse { margin-left: auto; color: var(--brand-ink-2); }
+  .app.collapsed .btn-collapse svg { transform: rotate(180deg); }
+  .side nav { display: grid; gap: 2px; }
+  .side nav a {
+    display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px; min-height: 44px;
+    color: var(--brand-ink-2); text-decoration: none; font-size: 14.5px; white-space: nowrap;
+  }
+  .side nav a:hover { background: rgba(255, 255, 255, 0.08); color: var(--brand-ink); }
+  .side nav a[aria-current="page"] { background: rgba(255, 255, 255, 0.15); color: var(--brand-ink); font-weight: 650; }
+  .side-foot { margin-top: auto; padding: 12px 8px 0; font-size: 12px; color: var(--brand-ink-2); display: grid; gap: 3px; }
+  .app.collapsed .lbl { display: none; }
+  .app.collapsed .side-head { flex-direction: column; padding-bottom: 8px; }
+  .app.collapsed .btn-collapse { margin-left: 0; }
+  .app.collapsed .side nav a { justify-content: center; padding: 10px; }
+  .scrim { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.42); z-index: 35; }
+
+  .bar {
+    position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 10px;
+    padding: 12px 24px; background: color-mix(in srgb, var(--page) 88%, transparent);
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border);
+  }
+  .bar h1 { margin: 0; font-size: 19px; line-height: 1.2; font-weight: 700; letter-spacing: -0.01em; }
+  .bar p { margin: 1px 0 0; font-size: 12.5px; color: var(--muted); }
+  .burger { display: none; color: var(--ink); margin-left: -6px; }
+  main { padding: 18px 24px 40px; max-width: 1200px; width: 100%; }
+  .view { display: none; gap: 16px; }
+  .view.active { display: grid; }
+
+  @media (max-width: 899px) {
+    .app, .app.collapsed { grid-template-columns: minmax(0, 1fr); }
+    .side {
+      position: fixed; left: 0; top: 0; bottom: 0; height: 100%; width: min(280px, 84vw);
+      transform: translateX(-102%); transition: transform 0.22s ease; box-shadow: 0 0 40px rgba(0, 0, 0, 0.3);
+    }
+    .app.menu-open .side { transform: none; }
+    .app.collapsed .lbl { display: initial; }
+    .app.collapsed .side-foot.lbl { display: grid; }
+    .app.collapsed .side-head { flex-direction: row; }
+    .app.collapsed .side nav a { justify-content: flex-start; padding: 10px 12px; }
+    .btn-collapse { display: none; }
+    .burger { display: inline-grid; }
+    .bar { padding: 10px 16px; }
+    main { padding: 14px 16px 32px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .side { transition: none; } }
+
+  /* Karten & Raster */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow); padding: 16px; min-width: 0; }
+  .card h2 { margin: 0; font-size: 16px; font-weight: 650; }
+  .card .sub { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+  .card-head { margin-bottom: 12px; }
+  .grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .grid-wide { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 16px; }
+  @media (max-width: 1100px) { .grid-wide { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 960px) { .grid2 { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 960px) { .first-m { order: -1; } }
+  .tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+  @media (max-width: 1180px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 460px) { .tiles { gap: 10px; } .tiles .card { padding: 12px; } }
   .eyebrow { margin: 0 0 6px; font-size: 13px; color: var(--ink-2); font-weight: 550; }
-  .hero { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 8px; margin: 0 0 6px; }
-  .hero-value { font-size: 52px; font-weight: 700; line-height: 1.02; letter-spacing: -0.02em; }
-  .hero-unit { font-size: 19px; font-weight: 600; color: var(--ink-2); }
-  .hero-sub { margin: 0; color: var(--ink-2); font-size: 14px; }
-  .hero-compare { margin-top: auto; padding-top: 14px; display: grid; gap: 8px; }
-  .minis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
-  .mini { background: var(--page); border-radius: 10px; padding: 8px 10px; }
-  .mini b { display: block; font-size: 18px; font-weight: 650; line-height: 1.2; }
-  .mini b small { font-size: 12px; font-weight: 500; color: var(--ink-2); margin-left: 2px; }
-  .mini span { display: block; font-size: 12px; color: var(--muted); }
-  .cmp-row { display: grid; grid-template-columns: 128px minmax(0, 1fr) auto; align-items: center; gap: 10px; font-size: 13px; color: var(--ink-2); }
-  .cmp-row .bar { height: 8px; border-radius: 4px; background: var(--grid); position: relative; overflow: hidden; }
-  .cmp-row .bar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; }
-  .cmp-row b { font-weight: 650; color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .cmp-row .nm { display: flex; align-items: center; gap: 7px; min-width: 0; }
-  .cmp-row .nm span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .tile .value { font-size: 27px; font-weight: 700; line-height: 1.1; letter-spacing: -0.01em; margin: 0 0 4px; }
-  .tile .value small { font-size: 15px; font-weight: 600; color: var(--ink-2); margin-left: 3px; }
+  .tile .value { font-size: 28px; font-weight: 700; line-height: 1.1; letter-spacing: -0.01em; margin: 0 0 6px; }
+  .tile .value small { font-size: 14px; font-weight: 600; color: var(--ink-2); margin-left: 4px; }
   .tile .note { margin: 0; font-size: 13px; color: var(--ink-2); }
-  .tile .note + .note { margin-top: 3px; }
-  .status { display: inline-flex; align-items: center; gap: 6px; font-weight: 650; }
-  .status svg { flex: none; }
+  @media (max-width: 460px) { .tile .value { font-size: 23px; } .tile .note { font-size: 12.5px; } }
+  .status { display: inline-flex; align-items: center; gap: 6px; }
   .bad { color: var(--bad-ink); }
   .good { color: var(--good-ink); }
+  .vbars { display: grid; grid-template-columns: minmax(0, 1fr); gap: 7px; }
+  .vbar { min-width: 0; }
+  .vbar .top { display: flex; flex-wrap: wrap; justify-content: space-between; column-gap: 8px; font-size: 12.5px; color: var(--ink-2); }
+  .vbar .top b { color: var(--ink); font-weight: 650; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .vbar .top span { min-width: 0; }
+  .vbar .vtrack { height: 6px; border-radius: 3px; background: var(--grid); margin-top: 3px; overflow: hidden; }
+  .vbar .vtrack i { display: block; height: 100%; border-radius: 3px; }
 
-  /* Legende & Diagramme */
-  .legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12.5px; color: var(--ink-2); margin: -4px 0 8px; }
+  /* Diagramme */
+  .legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12.5px; color: var(--ink-2); margin: 0 0 8px; }
   .legend span { display: inline-flex; align-items: center; gap: 6px; }
   .legend i { display: inline-block; width: 14px; height: 2px; border-radius: 2px; flex: none; }
   .legend i.box { width: 10px; height: 10px; border-radius: 3px; }
@@ -187,10 +214,8 @@
   .xhair { stroke: var(--ink-2); stroke-width: 1; opacity: 0.55; pointer-events: none; }
   .marker-line { stroke: var(--muted); stroke-width: 1; shape-rendering: crispEdges; }
   .tip {
-    position: absolute; z-index: 5; display: none; pointer-events: none;
-    background: var(--tip-bg); color: var(--ink);
-    border: 1px solid var(--border); border-radius: 10px;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.14);
+    position: absolute; z-index: 5; display: none; pointer-events: none; background: var(--tip-bg); color: var(--ink);
+    border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 4px 18px rgba(0, 0, 0, 0.14);
     padding: 8px 10px; font-size: 12.5px; line-height: 1.35; min-width: 150px; max-width: 280px;
   }
   .tip-t { color: var(--ink-2); font-size: 12px; margin-bottom: 4px; }
@@ -202,75 +227,66 @@
   .tip-n { color: var(--muted); font-size: 11.5px; margin-top: 4px; white-space: normal; }
   .chart-note { margin: 8px 0 0; font-size: 12.5px; color: var(--muted); }
 
-  /* Zeilenlisten */
+  /* Listen, Umschalter, Regler */
   .rows { list-style: none; margin: 0; padding: 0; }
   .rows li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 0; border-top: 1px solid var(--grid); }
   .rows li:first-child { border-top: 0; }
-  .rows .lbl { min-width: 0; }
-  .rows .lbl .t { display: block; font-size: 14px; }
-  .rows .lbl .n { display: block; font-size: 12.5px; color: var(--muted); margin-top: 1px; }
+  .rows .lbl2 { min-width: 0; }
+  .rows .lbl2 .t { display: block; font-size: 14px; }
+  .rows .lbl2 .n { display: block; font-size: 12.5px; color: var(--muted); margin-top: 1px; }
   .rows .val { font-size: 16px; font-weight: 650; white-space: nowrap; font-variant-numeric: tabular-nums; text-align: right; }
   .rows .val .u { font-size: 12.5px; font-weight: 500; color: var(--ink-2); margin-left: 3px; }
   .rows li.strong .val { font-size: 18px; }
-
-  /* Segment-Umschalter */
-  .seg { display: flex; gap: 2px; padding: 3px; background: var(--seg-bg); border-radius: 11px; margin-bottom: 12px; flex-wrap: wrap; }
+  .seg { display: flex; gap: 2px; padding: 3px; background: var(--seg-bg); border-radius: 11px; flex-wrap: wrap; }
   .seg button {
-    flex: 1 1 0; min-width: max-content; border: 0; background: transparent; color: var(--ink-2);
-    font: inherit; font-size: 13px; line-height: 1.2; padding: 8px 10px; border-radius: 8px;
-    cursor: pointer; white-space: nowrap; -webkit-tap-highlight-color: transparent;
+    flex: 1 1 0; min-width: max-content; border: 0; background: transparent; color: var(--ink-2); font: inherit; font-size: 13px;
+    line-height: 1.2; padding: 8px 10px; border-radius: 8px; cursor: pointer; white-space: nowrap; -webkit-tap-highlight-color: transparent;
   }
   .seg button:hover { color: var(--ink); }
   .seg button[aria-pressed="true"] { background: var(--seg-on); color: var(--ink); font-weight: 650; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 0 0 1px var(--border); }
   .seg button:focus-visible { outline: 2px solid var(--c-blau); outline-offset: 1px; }
   .seg.small button { font-size: 12.5px; padding: 6px 8px; }
-
-  /* Spielwiese */
-  .play { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 20px; }
-  @media (max-width: 860px) { .play { grid-template-columns: 1fr; } }
+  .seg.tabs { max-width: 560px; }
   .ctrl { display: grid; gap: 14px; }
   .ctrl-row { display: grid; gap: 4px; }
   .ctrl-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
   .ctrl-top label { font-size: 14px; }
   .ctrl-top .hint { font-size: 12px; color: var(--muted); }
-  .num { display: inline-flex; align-items: baseline; gap: 4px; }
+  .num { display: inline-flex; align-items: baseline; gap: 4px; flex: none; }
   .num input {
-    width: 92px; text-align: right; font: inherit; font-size: 15px; font-weight: 650; font-variant-numeric: tabular-nums;
+    width: 88px; text-align: right; font: inherit; font-size: 15px; font-weight: 650; font-variant-numeric: tabular-nums;
     color: var(--ink); background: var(--page); border: 1px solid var(--border); border-radius: 8px; padding: 4px 8px;
   }
   .num input:focus { outline: 2px solid var(--c-blau); outline-offset: 0; }
   .num span { font-size: 12.5px; color: var(--ink-2); }
-  input[type="range"] { width: 100%; accent-color: var(--c-blau); margin: 2px 0; height: 26px; }
+  input[type="range"] { width: 100%; accent-color: var(--c-blau); margin: 2px 0; height: 28px; }
   .chips { display: flex; flex-wrap: wrap; gap: 6px; }
   .chip {
     border: 1px solid var(--border); background: var(--page); color: var(--ink-2); font: inherit; font-size: 12.5px;
-    padding: 5px 10px; border-radius: 999px; cursor: pointer; -webkit-tap-highlight-color: transparent;
+    padding: 6px 11px; border-radius: 999px; cursor: pointer; -webkit-tap-highlight-color: transparent;
   }
   .chip:hover { color: var(--ink); border-color: var(--axis); }
   .chip[aria-pressed="true"] { background: var(--seg-on); color: var(--ink); font-weight: 650; box-shadow: 0 0 0 1px var(--ink-2) inset; }
-  .chip:focus-visible { outline: 2px solid var(--c-blau); outline-offset: 1px; }
   .btn-link { border: 0; background: none; padding: 0; font: inherit; font-size: 13px; color: var(--c-blau); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
   .badge { display: inline-block; font-size: 11.5px; font-weight: 650; padding: 2px 8px; border-radius: 999px; background: var(--seg-bg); color: var(--ink-2); vertical-align: 2px; }
   .badge.on { background: var(--warn); color: #0b0b0b; }
   .out-big { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; margin: 0 0 4px; }
   .out-big b { font-size: 34px; line-height: 1.1; font-weight: 700; letter-spacing: -0.01em; }
   .out-big span { color: var(--ink-2); font-size: 14px; }
-  .formula { font-size: 12px; color: var(--muted); margin: 10px 0 0; }
+  .formula { font-size: 12px; color: var(--muted); margin: 12px 0 0; }
+  .label-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
 
-  /* Zählerscheibe */
-  .disc-wrap { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 20px; align-items: start; }
-  @media (max-width: 760px) { .disc-wrap { grid-template-columns: 1fr; } }
+  /* Rechner */
+  .tool-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+  @media (max-width: 760px) { .tool-grid { grid-template-columns: minmax(0, 1fr); } }
   .tap {
-    width: 100%; min-height: 128px; border-radius: 16px; border: 2px dashed var(--axis); background: var(--page);
-    color: var(--ink); font: inherit; font-size: 16px; font-weight: 650; cursor: pointer; padding: 16px;
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
-    -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none;
+    width: 100%; min-height: 130px; border-radius: 16px; border: 2px dashed var(--axis); background: var(--page); color: var(--ink);
+    font: inherit; font-size: 16px; font-weight: 650; cursor: pointer; padding: 16px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 6px; -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none;
   }
   .tap small { font-weight: 450; font-size: 13px; color: var(--ink-2); }
   .tap:active { transform: scale(0.99); }
   .tap.running { border-style: solid; border-color: var(--c-blau); }
-  .tap:focus-visible { outline: 2px solid var(--c-blau); outline-offset: 2px; }
-  .disc-svg { display: block; margin: 0 auto 8px; }
 
   /* Tabellen */
   .table-wrap { overflow-x: auto; margin: 0 -16px; padding: 0 16px; }
@@ -291,7 +307,7 @@
   }
 
   /* Verträge */
-  .contracts { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+  .contracts { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 12px; }
   .contract { border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; background: var(--page); }
   .contract h3 { margin: 0 0 2px; font-size: 15px; font-weight: 650; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .contract .who { margin: 0 0 8px; font-size: 12.5px; color: var(--muted); }
@@ -301,230 +317,220 @@
   .contract .st { margin: 8px 0 0; font-size: 12.5px; color: var(--ink-2); }
   .pill { font-size: 11px; font-weight: 650; padding: 2px 8px; border-radius: 999px; background: var(--seg-bg); color: var(--ink-2); }
   .pill.aktiv { background: var(--c-blau); color: #fff; }
-  .deadlines { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+  .deadlines { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
   .deadline { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; padding: 7px 12px; border-radius: 10px; background: var(--page); border: 1px solid var(--border); }
   .deadline b { font-weight: 650; }
-
+  details.card summary { cursor: pointer; font-weight: 650; font-size: 16px; list-style-position: outside; }
+  details.card[open] summary { margin-bottom: 10px; }
   .notes { margin: 0; padding-left: 18px; color: var(--ink-2); font-size: 13.5px; display: grid; gap: 6px; }
   .notes b { color: var(--ink); font-weight: 600; }
-  footer { padding: 4px 0 28px; color: var(--muted); font-size: 12.5px; }
-  footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; }
-  a { color: var(--c-blau); }
-  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }
 </style>
 </head>
 <body>
-<header class="top">
-  <div class="wrap">
-    <div>
-      <h1>Stromverbrauch</h1>
-      <p id="stand"></p>
+<div class="app" id="app">
+  <aside class="side" id="side" aria-label="Menü">
+    <div class="side-head">
+      <span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M13.5 2 5 13.5h6L9.5 22 19 9.5h-6z" fill="#f5c84c"/></svg></span>
+      <span class="brand-t lbl">Strom</span>
+      <button type="button" class="icon-btn btn-collapse" id="btn-collapse" aria-label="Menü einklappen" title="Menü ein-/ausklappen"><svg class="ic" viewBox="0 0 24 24"><path d="M14.5 6.5 9 12l5.5 5.5"/></svg></button>
     </div>
-    <nav aria-label="Abschnitte">
-      <a href="#verlauf">Verlauf</a>
-      <a href="#kosten">Kosten</a>
-      <a href="#spielwiese">Spielwiese</a>
-      <a href="#tabellen">Tabellen</a>
-      <a href="#vertraege">Verträge</a>
+    <nav id="nav" aria-label="Bereiche">
+      <a href="#uebersicht" data-view="uebersicht" title="Übersicht"><svg class="ic" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.6"/></svg><span class="lbl">Übersicht</span></a>
+      <a href="#verbrauch" data-view="verbrauch" title="Verbrauch"><svg class="ic" viewBox="0 0 24 24"><path d="M3.5 3.5v17h17"/><path d="M7.5 15l3.8-4.2 3.2 3 5-6.3"/></svg><span class="lbl">Verbrauch</span></a>
+      <a href="#kosten" data-view="kosten" title="Kosten &amp; Abschlag"><svg class="ic" viewBox="0 0 24 24"><path d="M17.5 6.6A6.8 6.8 0 1 0 17.5 17.4"/><path d="M4 10.2h9.5M4 13.8h9.5"/></svg><span class="lbl">Kosten &amp; Abschlag</span></a>
+      <a href="#rechner" data-view="rechner" title="Rechner"><svg class="ic" viewBox="0 0 24 24"><rect x="5" y="2.8" width="14" height="18.4" rx="2.2"/><path d="M8.5 7h7M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01M8.5 15.5h.01M12 15.5h.01M15.5 15.5v.01"/></svg><span class="lbl">Rechner</span></a>
+      <a href="#daten" data-view="daten" title="Ablesungen &amp; Werte"><svg class="ic" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M3.5 9.5h17M3.5 14.5h17M9.5 9.5v10"/></svg><span class="lbl">Ablesungen &amp; Werte</span></a>
+      <a href="#vertraege" data-view="vertraege" title="Verträge"><svg class="ic" viewBox="0 0 24 24"><path d="M7 3h7.5L19 7.5V21H7z"/><path d="M14.5 3v4.5H19M10 12.5h6M10 16.5h6"/></svg><span class="lbl">Verträge</span></a>
     </nav>
+    <div class="side-foot lbl" id="side-foot"></div>
+  </aside>
+  <div class="scrim" id="scrim" hidden></div>
+
+  <div class="main-col">
+    <header class="bar">
+      <button type="button" class="icon-btn burger" id="btn-menu" aria-label="Menü öffnen" aria-controls="side" aria-expanded="false"><svg class="ic" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+      <div><h1 id="view-title">Übersicht</h1><p id="stand"></p></div>
+    </header>
+
+    <main id="main">
+      <!-- Übersicht -->
+      <section class="view" id="v-uebersicht" data-title="Übersicht">
+        <div class="tiles">
+          <div class="card tile">
+            <p class="eyebrow">Jahresverbrauch (hochgerechnet)</p>
+            <p class="value" id="k-hr">–</p>
+            <p class="note" id="k-hr-n"></p>
+          </div>
+          <div class="card tile">
+            <p class="eyebrow">Kosten pro Jahr</p>
+            <p class="value" id="k-kosten">–</p>
+            <p class="note" id="k-kosten-n"></p>
+          </div>
+          <div class="card tile">
+            <p class="eyebrow">Abschlag-Check</p>
+            <p class="value" id="k-abschlag">–</p>
+            <p class="note" id="k-abschlag-n"></p>
+          </div>
+          <div class="card tile" id="tile-vgl">
+            <p class="eyebrow">Vergleich alte Wohnung</p>
+            <p class="value" id="k-vgl">–</p>
+            <div class="vbars" id="k-vgl-bars"></div>
+          </div>
+        </div>
+        <section class="card" aria-labelledby="h-verlauf">
+          <div class="card-head">
+            <h2 id="h-verlauf">Verbrauch pro Tag</h2>
+            <p class="sub">Ø kWh pro Tag zwischen zwei Ablesungen</p>
+          </div>
+          <div class="legend" id="lg-verlauf"></div>
+          <div class="chart" id="ch-verlauf" tabindex="0" role="img" aria-label="Stufendiagramm: durchschnittlicher Verbrauch pro Tag je Ableseintervall für beide Wohnungen. Alle Werte stehen auch unter Ablesungen."></div>
+          <p class="chart-note" id="nt-verlauf"></p>
+        </section>
+      </section>
+
+      <!-- Verbrauch -->
+      <section class="view" id="v-verbrauch" data-title="Verbrauch">
+        <div class="grid2">
+          <section class="card" aria-labelledby="h-saison">
+            <div class="card-head">
+              <h2 id="h-saison">Saisonvergleich</h2>
+              <p class="sub">Ø kWh pro Tag je Kalendermonat</p>
+            </div>
+            <div class="legend" id="lg-saison"></div>
+            <div class="chart" id="ch-saison" tabindex="0" role="img" aria-label="Liniendiagramm: durchschnittlicher Verbrauch pro Tag je Kalendermonat für beide Wohnungen."></div>
+            <p class="chart-note" id="nt-saison"></p>
+          </section>
+          <section class="card" aria-labelledby="h-jahre">
+            <div class="card-head">
+              <h2 id="h-jahre">Jahresverbrauch</h2>
+              <p class="sub">kWh pro Kalenderjahr, Teiljahre hochgerechnet</p>
+            </div>
+            <div class="legend" id="lg-jahre"></div>
+            <div class="chart" id="ch-jahre" tabindex="0" role="img" aria-label="Säulendiagramm: Jahresverbrauch je Kalenderjahr und Wohnung. Alle Werte stehen auch unter Ablesungen und Werte."></div>
+          </section>
+        </div>
+      </section>
+
+      <!-- Kosten -->
+      <section class="view" id="v-kosten" data-title="Kosten &amp; Abschlag">
+        <div class="grid2">
+          <section class="card" aria-labelledby="h-annahmen">
+            <div class="card-head">
+              <h2 id="h-annahmen">Annahmen</h2>
+              <p class="sub" id="kosten-sub"></p>
+            </div>
+            <div class="seg small" id="presets" role="group" aria-label="Tarif-Vorlage" style="margin-bottom:14px"></div>
+            <div class="ctrl" id="ctrl"></div>
+            <div class="label-row"><span id="szenario-badge" class="badge">Vertragswerte</span><button type="button" class="btn-link" id="btn-reset">Zurücksetzen</button></div>
+          </section>
+          <section class="card first-m" aria-labelledby="h-ergebnis">
+            <div class="card-head">
+              <h2 id="h-ergebnis">Ergebnis Abrechnungsjahr</h2>
+            </div>
+            <ul class="rows" id="out-rows"></ul>
+          </section>
+        </div>
+        <div class="grid-wide">
+          <section class="card" aria-labelledby="h-kosten">
+            <div class="card-head">
+              <h2 id="h-kosten">Kosten und Abschläge</h2>
+              <p class="sub">kumuliert im Abrechnungsjahr</p>
+            </div>
+            <div class="legend" id="lg-kosten"></div>
+            <div class="chart" id="ch-kosten" tabindex="0" role="img" aria-label="Liniendiagramm: kumulierte Kosten (gemessen und Prognose) und kumulierte Abschläge im Abrechnungsjahr."></div>
+            <p class="chart-note" id="nt-kosten"></p>
+          </section>
+          <section class="card" aria-labelledby="h-tarife">
+            <div class="card-head">
+              <h2 id="h-tarife">Tarifvergleich</h2>
+              <p class="sub" id="tarife-sub"></p>
+            </div>
+            <div class="chart" id="ch-tarife" role="img" aria-label="Balkendiagramm: Jahreskosten je Tarif beim gewählten Jahresverbrauch."></div>
+            <p class="chart-note" id="nt-tarife"></p>
+          </section>
+        </div>
+      </section>
+
+      <!-- Rechner -->
+      <section class="view" id="v-rechner" data-title="Rechner">
+        <div class="seg tabs" id="seg-rechner" role="group" aria-label="Rechner wählen"></div>
+        <section class="card tool" id="t-dusche" aria-labelledby="h-dusche">
+          <div class="card-head">
+            <h2 id="h-dusche">Duschen mit dem Durchlauferhitzer</h2>
+            <p class="sub">Was das warme Wasser im Jahr kostet</p>
+          </div>
+          <div class="tool-grid">
+            <div class="ctrl" id="ctrl-dusche"></div>
+            <div>
+              <div class="out-big"><b id="du-eur">–</b><span id="du-eur-n"></span></div>
+              <ul class="rows" id="du-rows"></ul>
+              <p class="formula">Energie = Liter × 4,19 kJ/(kg·K) × Temperaturunterschied ÷ 3.600, Wirkungsgrad 98 %. Händewaschen und Abwasch kommen noch dazu.</p>
+            </div>
+          </div>
+        </section>
+        <section class="card tool" id="t-geraet" aria-labelledby="h-geraet" hidden>
+          <div class="card-head">
+            <h2 id="h-geraet">Was kostet ein Gerät?</h2>
+            <p class="sub">Leistung × Nutzungsdauer zum aktuellen Arbeitspreis</p>
+          </div>
+          <div class="tool-grid">
+            <div>
+              <div class="chips" id="geraet-chips" role="group" aria-label="Beispielgeräte" style="margin-bottom:14px"></div>
+              <div class="ctrl" id="ctrl-geraet"></div>
+            </div>
+            <div>
+              <div class="out-big"><b id="ge-eur">–</b><span id="ge-eur-n"></span></div>
+              <ul class="rows" id="ge-rows"></ul>
+            </div>
+          </div>
+        </section>
+        <section class="card tool" id="t-disc" aria-labelledby="h-disc" hidden>
+          <div class="card-head">
+            <h2 id="h-disc">Zählerscheibe als Leistungsmesser</h2>
+            <p class="sub" id="disc-sub"></p>
+          </div>
+          <div class="tool-grid">
+            <div>
+              <button type="button" class="tap" id="tap"><span id="tap-t">Start: tippen, wenn die rote Markierung vorbeikommt</span><small id="tap-n">danach bei jeder Umdrehung erneut tippen</small></button>
+              <div class="label-row" style="margin-top:8px"><span class="formula" style="margin:0" id="tap-info">Noch keine Messung</span><button type="button" class="btn-link" id="tap-reset">Neu starten</button></div>
+              <div class="ctrl" id="ctrl-disc" style="margin-top:12px"></div>
+            </div>
+            <div>
+              <div class="out-big"><b id="disc-w">–</b><span>Watt</span></div>
+              <ul class="rows" id="disc-rows"></ul>
+              <p class="formula" id="disc-formula"></p>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <!-- Daten -->
+      <section class="view" id="v-daten" data-title="Ablesungen &amp; Werte">
+        <div class="seg tabs" id="seg-daten" role="group" aria-label="Tabelle wählen" style="max-width:none"></div>
+        <section class="card">
+          <div class="table-wrap">
+            <table id="tb-daten"><thead></thead><tbody></tbody></table>
+          </div>
+        </section>
+      </section>
+
+      <!-- Verträge -->
+      <section class="view" id="v-vertraege" data-title="Verträge">
+        <section class="card" aria-labelledby="h-vertraege">
+          <div class="card-head">
+            <h2 id="h-vertraege">Fristen &amp; Verträge</h2>
+          </div>
+          <div class="deadlines" id="deadlines"></div>
+          <div class="contracts" id="contracts"></div>
+        </section>
+        <details class="card">
+          <summary>Hinweise &amp; Berechnung</summary>
+          <ul class="notes" id="notes"></ul>
+        </details>
+      </section>
+    </main>
   </div>
-</header>
-
-<main class="wrap">
-  <section class="kpis" aria-label="Kennzahlen">
-    <div class="card hero-card">
-      <p class="eyebrow" id="hero-eyebrow">Hochrechnung Jahresverbrauch</p>
-      <div class="hero"><span class="hero-value" id="hero-value">–</span><span class="hero-unit">kWh/Jahr</span></div>
-      <p class="hero-sub" id="hero-sub"></p>
-      <div class="minis" id="hero-minis"></div>
-      <div class="hero-compare" id="hero-compare"></div>
-    </div>
-    <div class="card tile">
-      <p class="eyebrow">Kosten pro Jahr</p>
-      <p class="value" id="k-kosten">–</p>
-      <p class="note" id="k-kosten-n"></p>
-    </div>
-    <div class="card tile">
-      <p class="eyebrow" id="k-abschlag-t">Abschlag-Check</p>
-      <p class="value" id="k-abschlag">–</p>
-      <p class="note" id="k-abschlag-n"></p>
-    </div>
-    <div class="card tile">
-      <p class="eyebrow" id="k-vgl-t">Vergleich alte Wohnung</p>
-      <p class="value" id="k-vgl">–</p>
-      <p class="note" id="k-vgl-n"></p>
-    </div>
-    <div class="card tile">
-      <p class="eyebrow">Letzte Ablesung</p>
-      <p class="value" id="k-last">–</p>
-      <p class="note" id="k-last-n"></p>
-    </div>
-  </section>
-
-  <section class="card" id="verlauf" aria-labelledby="h-verlauf">
-    <div class="card-head stack">
-      <h2 id="h-verlauf">Verbrauch pro Tag im Verlauf</h2>
-      <p class="sub">Ø kWh pro Tag zwischen zwei Ablesungen – alte und neue Wohnung getrennt</p>
-    </div>
-    <div class="legend" id="lg-verlauf"></div>
-    <div class="chart" id="ch-verlauf" tabindex="0" role="img" aria-label="Stufendiagramm: durchschnittlicher Verbrauch pro Tag je Ableseintervall für beide Wohnungen. Alle Werte stehen auch in der Tabelle Ablesungen."></div>
-    <p class="chart-note" id="nt-verlauf"></p>
-  </section>
-
-  <div class="duo">
-    <section class="card" aria-labelledby="h-saison">
-      <div class="card-head stack">
-        <h2 id="h-saison">Saisonvergleich</h2>
-        <p class="sub">Ø kWh pro Tag je Kalendermonat (alte Wohnung: Mittel aller Jahre)</p>
-      </div>
-      <div class="legend" id="lg-saison"></div>
-      <div class="chart" id="ch-saison" tabindex="0" role="img" aria-label="Liniendiagramm: durchschnittlicher Verbrauch pro Tag je Kalendermonat für beide Wohnungen."></div>
-      <p class="chart-note" id="nt-saison"></p>
-    </section>
-    <section class="card" aria-labelledby="h-jahre">
-      <div class="card-head stack">
-        <h2 id="h-jahre">Jahresverbrauch</h2>
-        <p class="sub">kWh pro Kalenderjahr, Teiljahre auf 365 Tage hochgerechnet</p>
-      </div>
-      <div class="legend" id="lg-jahre"></div>
-      <div class="chart" id="ch-jahre" tabindex="0" role="img" aria-label="Säulendiagramm: Jahresverbrauch je Kalenderjahr und Wohnung. Alle Werte stehen auch in der Tabelle Jahreswerte."></div>
-    </section>
-  </div>
-
-  <section class="card" id="kosten" aria-labelledby="h-kosten">
-    <div class="card-head">
-      <h2 id="h-kosten">Abrechnungsjahr durchspielen</h2>
-      <p class="sub" id="kosten-sub"></p>
-    </div>
-    <div class="play">
-      <div>
-        <div class="seg small" id="presets" role="group" aria-label="Tarif-Vorlage"></div>
-        <div class="ctrl" id="ctrl"></div>
-        <p class="formula"><span id="szenario-badge" class="badge">Vertragswerte</span> <button type="button" class="btn-link" id="btn-reset">Zurücksetzen</button></p>
-      </div>
-      <div>
-        <ul class="rows" id="out-rows"></ul>
-      </div>
-    </div>
-    <h3 class="section-title" style="margin-top:18px">Kosten und Abschläge im Abrechnungsjahr (kumuliert)</h3>
-    <div class="legend" id="lg-kosten" style="margin-top:10px"></div>
-    <div class="chart" id="ch-kosten" tabindex="0" role="img" aria-label="Liniendiagramm: kumulierte Kosten (gemessen und Prognose) und kumulierte Abschläge im Abrechnungsjahr."></div>
-    <p class="chart-note" id="nt-kosten"></p>
-  </section>
-
-  <section class="card" aria-labelledby="h-tarife">
-    <div class="card-head stack">
-      <h2 id="h-tarife">Tarifvergleich</h2>
-      <p class="sub" id="tarife-sub"></p>
-    </div>
-    <div class="chart" id="ch-tarife" role="img" aria-label="Balkendiagramm: Jahreskosten je Tarif beim gewählten Jahresverbrauch."></div>
-    <p class="chart-note" id="nt-tarife"></p>
-  </section>
-
-  <h2 class="section-title" id="spielwiese">Spielwiese</h2>
-  <div class="duo">
-    <section class="card" aria-labelledby="h-dusche">
-      <div class="card-head stack">
-        <h2 id="h-dusche">Duschen mit dem Durchlauferhitzer</h2>
-        <p class="sub">Was das warme Wasser im Jahr kostet</p>
-      </div>
-      <div class="ctrl" id="ctrl-dusche"></div>
-      <div style="margin-top:16px">
-        <div class="out-big"><b id="du-eur">–</b><span id="du-eur-n"></span></div>
-        <ul class="rows" id="du-rows"></ul>
-        <p class="formula">Energie = Liter × 4,19 kJ/(kg·K) × (Duschtemperatur − Kaltwasser) ÷ 3.600, Wirkungsgrad 98 %. Händewaschen und Abwasch kommen beim Durchlauferhitzer noch dazu.</p>
-      </div>
-    </section>
-    <section class="card" aria-labelledby="h-geraet">
-      <div class="card-head stack">
-        <h2 id="h-geraet">Was kostet ein Gerät?</h2>
-        <p class="sub">Leistung × Nutzungsdauer – zum aktuellen Arbeitspreis</p>
-      </div>
-      <div class="chips" id="geraet-chips" role="group" aria-label="Beispielgeräte" style="margin-bottom:14px"></div>
-      <div class="ctrl" id="ctrl-geraet"></div>
-      <div style="margin-top:16px">
-        <div class="out-big"><b id="ge-eur">–</b><span id="ge-eur-n"></span></div>
-        <ul class="rows" id="ge-rows"></ul>
-      </div>
-    </section>
-  </div>
-
-  <section class="card" aria-labelledby="h-disc">
-    <div class="card-head stack">
-      <h2 id="h-disc">Zählerscheibe als Leistungsmesser</h2>
-      <p class="sub" id="disc-sub"></p>
-    </div>
-    <div class="disc-wrap">
-      <div>
-        <button type="button" class="tap" id="tap"><span id="tap-t">Start: tippen, wenn die rote Markierung vorbeikommt</span><small id="tap-n">danach bei jeder weiteren Umdrehung erneut tippen</small></button>
-        <p class="formula" style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><span id="tap-info">Noch keine Messung</span><button type="button" class="btn-link" id="tap-reset">Neu starten</button></p>
-        <div class="ctrl" id="ctrl-disc" style="margin-top:6px"></div>
-      </div>
-      <div>
-        <div class="out-big"><b id="disc-w">–</b><span>Watt</span></div>
-        <ul class="rows" id="disc-rows"></ul>
-        <p class="formula" id="disc-formula"></p>
-      </div>
-    </div>
-  </section>
-
-  <section class="card" id="tabellen" aria-labelledby="h-abl">
-    <div class="card-head">
-      <h2 id="h-abl">Ablesungen</h2>
-      <p class="sub">neueste zuerst · Datenbasis: Excel</p>
-    </div>
-    <div class="table-wrap">
-      <table id="tb-abl">
-        <thead>
-          <tr>
-            <th scope="col">Datum</th>
-            <th scope="col">Zählerstand<small>kWh</small></th>
-            <th scope="col">Verbrauch<small>kWh</small></th>
-            <th scope="col" class="opt">Tage</th>
-            <th scope="col">Ø pro Tag<small>kWh</small></th>
-            <th scope="col">Kosten<small>€</small></th>
-            <th scope="col" class="txt opt">Quelle / Bemerkung</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </section>
-
-  <section class="card" aria-labelledby="h-werte">
-    <div class="card-head">
-      <h2 id="h-werte">Monats- und Jahreswerte</h2>
-      <p class="sub">linear zwischen den Ablesungen interpoliert</p>
-    </div>
-    <div class="seg" id="seg-werte" role="group" aria-label="Tabelle wählen"></div>
-    <div class="table-wrap">
-      <table id="tb-werte"><thead></thead><tbody></tbody></table>
-    </div>
-  </section>
-
-  <section class="card" id="vertraege" aria-labelledby="h-vertraege">
-    <div class="card-head">
-      <h2 id="h-vertraege">Verträge &amp; Fristen</h2>
-      <p class="sub">Preise brutto laut Vertragsunterlagen</p>
-    </div>
-    <div class="deadlines" id="deadlines"></div>
-    <div class="contracts" id="contracts"></div>
-  </section>
-
-  <section class="card" aria-labelledby="h-hinweise">
-    <div class="card-head">
-      <h2 id="h-hinweise">Hinweise &amp; Berechnung</h2>
-    </div>
-    <ul class="notes" id="notes"></ul>
-  </section>
-</main>
-
-<footer>
-  <div class="wrap">
-    <span id="foot-l"></span>
-    <span>Neue Ablesung: Foto vom Zähler in den Ordner legen</span>
-  </div>
-</footer>
+</div>
 
 <script src="messwerte.js"></script>
 <script>
@@ -793,8 +799,11 @@
 
   /* ---------- Kopf & Kennzahlen ---------- */
   function renderKopf() {
-    $('stand').textContent = CUR.name + ' · letzte Ablesung ' + fdate(LAST.t) + ' · Zählerstand ' + fmt(LAST.stand, 1) + ' kWh';
-    $('foot-l').textContent = 'Datenbasis: ' + D.quelle + ' · erzeugt ' + D.erzeugt.split(' ')[0].split('-').reverse().join('.') + ' ' + (D.erzeugt.split(' ')[1] || '');
+    $('stand').textContent = 'Letzte Ablesung ' + fdate(LAST.t) + ' · ' + fmt(LAST.stand, 1) + ' kWh';
+    var sf = clear($('side-foot'));
+    sf.appendChild(el('div', '', CUR.name + ' · ' + (CUR.kurz || '')));
+    sf.appendChild(el('div', '', 'Stand ' + D.erzeugt.split(' ')[0].split('-').reverse().join('.')));
+    sf.appendChild(el('div', '', 'Neue Ablesung: Foto in den Ordner legen'));
   }
   function iconWarn() {
     var sv = s('svg', { width: 16, height: 16, viewBox: '0 0 16 16', 'aria-hidden': 'true' });
@@ -811,49 +820,27 @@
   }
   function renderKpis() {
     if (!TC) return;
-    $('hero-value').textContent = fmt(TC.hr, 0);
-    $('hero-sub').textContent = 'Ø ' + fmt(TC.proTag, 2) + ' kWh pro Tag · ' + CUR.name + ' seit ' + fdate(TC.von) + ' (' + fmt(TC.tage) + ' Tage)';
-    var mn = clear($('hero-minis'));
-    [[fmt(TC.proTag, 2), 'kWh', 'pro Tag'], [fmt(TC.proTag * 365 / 12, 0), 'kWh', 'pro Monat'], [fmt(TC.proTag * 1000 / 24, 0), 'W', 'Ø Leistung']].forEach(function (x) {
-      var d = el('div', 'mini'); var b = el('b', '', x[0]); b.appendChild(el('small', '', x[1])); d.appendChild(b); d.appendChild(el('span', '', x[2])); mn.appendChild(d);
-    });
-    var cmp = clear($('hero-compare'));
-    var maxHr = Math.max.apply(null, W.map(function (w) { return TOT[w.name] ? TOT[w.name].hr : 0; }));
-    W.slice().reverse().forEach(function (w) {
-      var t = TOT[w.name]; if (!t) return;
-      var row = el('div', 'cmp-row');
-      var nm = el('span', 'nm'); var k = el('span', 'key'); k.style.background = w.col; nm.appendChild(k); nm.appendChild(el('span', '', w.name)); row.appendChild(nm);
-      var bar = el('span', 'bar'); var fill = el('i'); fill.style.width = (t.hr / maxHr * 100).toFixed(1) + '%'; fill.style.background = w.col; bar.appendChild(fill); row.appendChild(bar);
-      row.appendChild(el('b', '', fmt(t.hr, 0) + ' kWh'));
-      row.title = w.name + ': Ø ' + fmt(t.proTag, 2) + ' kWh/Tag (' + fdate(t.von) + '–' + fdate(t.bis) + ')';
-      cmp.appendChild(row);
-    });
-    // Kosten pro Jahr (Hochrechnung × aktueller Tarif)
+    var hr = $('k-hr'); hr.textContent = fmt(TC.hr, 0); hr.appendChild(el('small', '', 'kWh'));
+    $('k-hr-n').textContent = 'Ø ' + fmt(TC.proTag, 2) + ' kWh pro Tag · ' + fmt(TC.proTag * 365 / 12, 0) + ' kWh pro Monat';
     var kj = AKT.gpJahr + TC.hr * AKT.ap / 100;
     $('k-kosten').textContent = '≈ ' + eur(kj);
-    $('k-kosten-n').textContent = '≈ ' + eur(kj / 12) + ' pro Monat bei ' + fmt(TC.hr, 0) + ' kWh · ' + AKT.bezeichnung + ' (' + fmt(AKT.ap, 2) + ' ct/kWh + ' + fmt(AKT.gpJahr / 12, 2) + ' €/Monat)';
-    // Abschlag-Check
+    $('k-kosten-n').textContent = '≈ ' + eur(kj / 12) + ' pro Monat · ' + AKT.bezeichnung;
     var pk = prognoseKwh(BASEN[0].proTag), pkost = AKT.gpJahr + pk * AKT.ap / 100, abs = 12 * (AKT.abschlag || 0), saldo = abs - pkost;
-    $('k-abschlag-t').textContent = 'Abschlag-Check ' + fdate(BJ.start + 1).slice(3) + '–' + fdate(BJ.ende).slice(3);
     var v = clear($('k-abschlag')); var st = el('span', 'status');
     st.appendChild(saldo < 0 ? iconWarn() : iconOk());
     st.appendChild(document.createTextNode('≈ ' + eur(Math.abs(saldo))));
-    v.appendChild(st); var sm = el('small', '', saldo < 0 ? 'Nachzahlung' : 'Guthaben'); v.appendChild(sm);
-    $('k-abschlag-n').textContent = 'Prognose ' + eur(pkost) + ' vs. Abschläge ' + eur(abs) + ' (12 × ' + eur(AKT.abschlag) + ')' +
-      (saldo < 0 ? ' · passender Abschlag: ' + eur(Math.ceil(pkost / 12)) + '/Monat' : '');
-    // Vergleich
-    if (TP) {
-      var d = TC.proTag / TP.proTag - 1;
-      var vv = clear($('k-vgl')); var s2 = el('span', d > 0 ? 'bad' : 'good', (d > 0 ? '▲ ' : '▼ ') + fmtS(d * 100, 0) + ' %'); vv.appendChild(s2);
-      var sea = sameMonths();
-      $('k-vgl-n').textContent = fmt(TC.proTag, 2) + ' statt ' + fmt(TP.proTag, 2) + ' kWh pro Tag' +
-        (sea ? ' · gleiche Monate (' + sea.label + '): ' + fmtS(sea.delta * 100, 0) + ' %' : '');
-    } else { $('k-vgl-t').parentNode.style.display = 'none'; }
-    // Letzte Ablesung
-    $('k-last').textContent = fmt(LAST.stand, 1);
-    $('k-last').appendChild(el('small', '', 'kWh'));
-    var li = IV_CUR[IV_CUR.length - 1];
-    $('k-last-n').textContent = fdate(LAST.t) + (li ? ' · +' + fmt(li.kwh, 1) + ' kWh seit ' + fdate(li.von) + ' (' + fmt(li.proTag, 2) + ' kWh/Tag)' : '');
+    v.appendChild(st); v.appendChild(el('small', '', saldo < 0 ? 'Nachzahlung' : 'Guthaben'));
+    $('k-abschlag-n').textContent = 'zum ' + fdate(BJ.ende) + (saldo < 0 ? ' · passend: ' + eur(Math.ceil(pkost / 12)) + ' statt ' + eur(AKT.abschlag) + ' im Monat' : ' · Abschlag reicht');
+    if (!TP) { $('tile-vgl').style.display = 'none'; return; }
+    var d = TC.proTag / TP.proTag - 1;
+    var vv = clear($('k-vgl')); vv.appendChild(el('span', d > 0 ? 'bad' : 'good', (d > 0 ? '▲ ' : '▼ ') + fmtS(d * 100, 0) + ' %'));
+    var bars = clear($('k-vgl-bars')), maxHr = Math.max(TC.hr, TP.hr);
+    [CUR, PREV].forEach(function (w) {
+      var t = TOT[w.name], row = el('div', 'vbar'), top = el('div', 'top');
+      top.appendChild(el('span', '', w.name)); top.appendChild(el('b', '', fmt(t.hr, 0) + ' kWh'));
+      var bar = el('div', 'vtrack'), fill = el('i'); fill.style.width = (t.hr / maxHr * 100).toFixed(1) + '%'; fill.style.background = w.col;
+      bar.appendChild(fill); row.appendChild(top); row.appendChild(bar); bars.appendChild(row);
+    });
   }
   function sameMonths() {
     if (!PREV) return null;
@@ -935,9 +922,7 @@
       }
     });
     legend('lg-verlauf', W.slice().reverse().map(function (w) { return { color: w.col, label: w.name + ' (Ø ' + fmt(TOT[w.name].proTag, 2) + ' kWh/Tag)' }; }));
-    var lang = W.some(function (w) { return mergedIntervals(w).some(function (iv) { return iv.tage > 120; }); });
-    $('nt-verlauf').textContent = (lang ? 'Lange Ableseintervalle zeigen nur den Mittelwert über den ganzen Zeitraum. ' : '') +
-      'Je öfter ein Foto vom Zähler kommt, desto feiner wird der Verlauf.';
+    $('nt-verlauf').textContent = 'Je öfter ein Foto vom Zähler kommt, desto feiner wird der Verlauf.';
   }
 
   /* ---------- Diagramm: Saison ---------- */
@@ -1094,7 +1079,7 @@
   }
   function rowItem(label, note, value, unit, cls) {
     var li = el('li', cls || '');
-    var l = el('span', 'lbl'); l.appendChild(el('span', 't', label)); if (note) l.appendChild(el('span', 'n', note));
+    var l = el('span', 'lbl2'); l.appendChild(el('span', 't', label)); if (note) l.appendChild(el('span', 'n', note));
     var v = el('span', 'val'); if (value instanceof Node) v.appendChild(value); else v.appendChild(document.createTextNode(value));
     if (unit) v.appendChild(el('span', 'u', unit));
     li.appendChild(l); li.appendChild(v); return li;
@@ -1222,7 +1207,7 @@
       var t = stext(F.svg, x0 + w + 8, by + 11, eur(r.kost), 't-val', 'start');
       if (ref && !r.akt) { var ts = s('tspan', { class: 't-muted', dx: 6 }, t); ts.textContent = fmtS(r.kost - ref.kost, 0) + ' €'; }
     });
-    $('tarife-sub').textContent = 'Jahreskosten bei ' + fmt(z.kwh, 0) + ' kWh (Verbrauch aus „Abrechnungsjahr durchspielen“)';
+    $('tarife-sub').textContent = 'Jahreskosten bei ' + fmt(z.kwh, 0) + ' kWh pro Jahr (aus den Annahmen)';
     var teuer = rows.filter(function (r) { return !r.akt && !r.sz; }).sort(function (a, b) { return b.kost - a.kost; })[0];
     $('nt-tarife').textContent = (ref && teuer && teuer.kost > ref.kost) ? 'Der Wechsel spart bei diesem Verbrauch ≈ ' + eur(teuer.kost - ref.kost) + ' pro Jahr gegenüber „' + teuer.label + '“.' : '';
   }
@@ -1321,47 +1306,50 @@
 
   /* ---------- Tabellen ---------- */
   function td(text, cls) { return el('td', cls || '', text); }
-  function renderAblesungen() {
-    var tb = clear(document.querySelector('#tb-abl tbody'));
-    W.slice().reverse().forEach(function (w) {
-      var t = TOT[w.name];
-      var g = el('tr', 'grp'); var c = el('td'); c.colSpan = 7;
-      var k = el('span', 'key'); k.style.background = w.col; c.appendChild(k); c.appendChild(document.createTextNode(w.name));
-      c.appendChild(el('span', 'n', (w.kurz ? w.kurz + ' · ' : '') + w.zeitraum + (t ? ' · Ø ' + fmt(t.proTag, 2) + ' kWh/Tag' : '')));
-      g.appendChild(c); tb.appendChild(g);
-      var iv = intervals(w);
-      for (var i = w.r.length - 1; i >= 0; i--) {
-        var r = w.r[i], it = i > 0 ? iv[i - 1] : null, tr = el('tr');
-        tr.appendChild(td(fdate(r.t)));
-        tr.appendChild(td(fmt(r.stand, 1)));
-        tr.appendChild(td(it ? fmt(it.kwh, 1) : '–', it ? '' : 'dim'));
-        tr.appendChild(td(it ? fmt(it.tage) : '–', 'opt' + (it ? '' : ' dim')));
-        tr.appendChild(td(it && it.proTag != null ? fmt(it.proTag, 2) : '–', it ? '' : 'dim'));
-        tr.appendChild(td(it && it.kosten != null ? fmt(it.kosten, 2) : '–', it && it.kosten != null ? '' : 'dim'));
-        var txt = [r.quelle, r.bemerkung].filter(Boolean).join(' · ');
-        if (it && it.tarif) txt += (txt ? ' · ' : '') + 'Tarif ' + it.tarif.bezeichnung;
-        tr.appendChild(td(txt, 'txt opt'));
-        tb.appendChild(tr);
-      }
-    });
-  }
-  var WERTE_MODUS = 'm0';
-  function renderWerte() {
-    var opts = W.slice().reverse().map(function (w, i) { return { id: 'm' + i, label: 'Monate ' + w.name, w: w }; });
+  var DATEN_MODUS = 'abl';
+  function renderDaten() {
+    var opts = [{ id: 'abl', label: 'Ablesungen' }];
+    W.slice().reverse().forEach(function (w, i) { opts.push({ id: 'm' + i, label: 'Monate ' + w.name, w: w }); });
     opts.push({ id: 'j', label: 'Jahre' });
-    seg($('seg-werte'), opts, WERTE_MODUS, function (id) { WERTE_MODUS = id; tableWerte(opts); });
-    tableWerte(opts);
+    seg($('seg-daten'), opts, DATEN_MODUS, function (id) { DATEN_MODUS = id; tableDaten(opts); });
+    tableDaten(opts);
   }
-  function tableWerte(opts) {
-    var th = clear(document.querySelector('#tb-werte thead')), tb = clear(document.querySelector('#tb-werte tbody'));
+  function tableDaten(opts) {
+    var th = clear(document.querySelector('#tb-daten thead')), tb = clear(document.querySelector('#tb-daten tbody'));
     function head(cols) { var tr = el('tr'); cols.forEach(function (c) { var h = el('th', c[2] || ''); h.scope = 'col'; h.appendChild(document.createTextNode(c[0])); if (c[1]) h.appendChild(el('small', '', c[1])); tr.appendChild(h); }); th.appendChild(tr); }
-    if (WERTE_MODUS === 'j') {
-      head([['Jahr'], ['Wohnung', null, 'txt opt'], ['Verbrauch', 'kWh erfasst'], ['Tage', 'erfasst', 'opt'], ['Ø pro Tag', 'kWh'], ['Hochrechnung', 'kWh/Jahr'], ['Kosten', '€ erfasst']]);
+    function keyCell(w, text, cls) { var c = el('td', cls || ''); var k = el('span', 'key'); k.style.background = w.col; k.style.marginRight = '7px'; c.appendChild(k); c.appendChild(document.createTextNode(text)); return c; }
+    if (DATEN_MODUS === 'abl') {
+      head([['Datum'], ['Stand', 'kWh'], ['Verbrauch', 'kWh'], ['Tage', null, 'opt'], ['Ø/Tag', 'kWh'], ['Kosten', '€'], ['Quelle / Bemerkung', null, 'txt opt']]);
+      W.slice().reverse().forEach(function (w) {
+        var t = TOT[w.name];
+        var g = el('tr', 'grp'); var c = el('td'); c.colSpan = 7;
+        var k = el('span', 'key'); k.style.background = w.col; c.appendChild(k); c.appendChild(document.createTextNode(w.name));
+        c.appendChild(el('span', 'n', w.zeitraum + (t ? ' · Ø ' + fmt(t.proTag, 2) + ' kWh/Tag' : '')));
+        g.appendChild(c); tb.appendChild(g);
+        var iv = intervals(w);
+        for (var i = w.r.length - 1; i >= 0; i--) {
+          var r = w.r[i], it = i > 0 ? iv[i - 1] : null, tr = el('tr');
+          tr.appendChild(td(fdate(r.t)));
+          tr.appendChild(td(fmt(r.stand, 1)));
+          tr.appendChild(td(it ? fmt(it.kwh, 1) : '–', it ? '' : 'dim'));
+          tr.appendChild(td(it ? fmt(it.tage) : '–', 'opt' + (it ? '' : ' dim')));
+          tr.appendChild(td(it && it.proTag != null ? fmt(it.proTag, 2) : '–', it ? '' : 'dim'));
+          tr.appendChild(td(it && it.kosten != null ? fmt(it.kosten, 2) : '–', it && it.kosten != null ? '' : 'dim'));
+          var txt = [r.quelle, r.bemerkung].filter(Boolean).join(' · ');
+          if (it && it.tarif) txt += (txt ? ' · ' : '') + 'Tarif ' + it.tarif.bezeichnung;
+          tr.appendChild(td(txt, 'txt opt'));
+          tb.appendChild(tr);
+        }
+      });
+      return;
+    }
+    if (DATEN_MODUS === 'j') {
+      head([['Jahr'], ['Wohnung', null, 'txt opt'], ['Verbrauch', 'kWh erfasst'], ['Tage', 'erfasst', 'opt'], ['Ø/Tag', 'kWh'], ['Hochrechn.', 'kWh/Jahr'], ['Kosten', '€ erfasst']]);
       var all = []; W.forEach(function (w) { years(w).forEach(function (y) { all.push(y); }); });
       all.reverse().forEach(function (y) {
         var tr = el('tr');
-        var cy = el('td'); var ky = el('span', 'key'); ky.style.background = y.w.col; ky.style.marginRight = '7px'; cy.appendChild(ky); cy.appendChild(document.createTextNode(y.y + (y.voll ? '' : '*'))); tr.appendChild(cy);
-        var c = el('td', 'txt opt'); var k = el('span', 'key'); k.style.background = y.w.col; k.style.marginRight = '7px'; c.appendChild(k); c.appendChild(document.createTextNode(y.w.name)); tr.appendChild(c);
+        tr.appendChild(keyCell(y.w, y.y + (y.voll ? '' : '*')));
+        tr.appendChild(td(y.w.name, 'txt opt'));
         tr.appendChild(td(fmt(y.kwh, 0))); tr.appendChild(td(fmt(y.tage), 'opt')); tr.appendChild(td(fmt(y.proTag, 2)));
         tr.appendChild(td(fmt(y.hr, 0))); tr.appendChild(td(y.kosten != null ? fmt(y.kosten, 2) : '–', y.kosten != null ? '' : 'dim'));
         tb.appendChild(tr);
@@ -1369,8 +1357,8 @@
       var n = el('tr'); var c2 = el('td', 'txt', '* Teiljahr – Hochrechnung = Ø pro Tag × 365'); c2.colSpan = 7; c2.style.color = 'var(--muted)'; n.appendChild(c2); tb.appendChild(n);
       return;
     }
-    var o = opts.filter(function (x) { return x.id === WERTE_MODUS; })[0] || opts[0];
-    head([['Monat'], ['Verbrauch', 'kWh'], ['Ø pro Tag', 'kWh'], ['voller Monat', 'kWh', 'opt'], ['Kosten', '€'], ['Hinweis', null, 'txt opt']]);
+    var o = opts.filter(function (x) { return x.id === DATEN_MODUS; })[0];
+    head([['Monat'], ['Verbrauch', 'kWh'], ['Ø/Tag', 'kWh'], ['voller Monat', 'kWh', 'opt'], ['Kosten', '€'], ['Hinweis', null, 'txt opt']]);
     months(o.w).slice().reverse().forEach(function (m) {
       var tr = el('tr');
       tr.appendChild(td(MON[m.m] + ' ' + m.y));
@@ -1433,25 +1421,70 @@
     li('Ablesen:', 'Schwarze Ziffern = volle kWh, die rote Ziffer = Zehntel. Steht eine Walze zwischen zwei Ziffern, gilt die kleinere.');
   }
 
+  /* ---------- Rechner-Umschalter ---------- */
+  function initRechnerTabs() {
+    var tools = [{ id: 't-dusche', label: 'Duschen' }, { id: 't-geraet', label: 'Geräte' }, { id: 't-disc', label: 'Zählerscheibe' }];
+    seg($('seg-rechner'), tools, 't-dusche', function (id) { tools.forEach(function (t) { $(t.id).hidden = t.id !== id; }); });
+  }
+
+  /* ---------- Ansichten & Menü ---------- */
+  var APP = $('app'), VIEWS = {
+    uebersicht: [drawVerlauf], verbrauch: [drawSaison, drawJahre], kosten: [updateSpiel], rechner: [], daten: [], vertraege: []
+  };
+  var ALIAS = { verlauf: 'uebersicht', spielwiese: 'rechner', tabellen: 'daten' };
+  var AKTUELL = null;
+  function istMobil() { return window.matchMedia('(max-width: 899px)').matches; }
+  function menu(offen) {
+    APP.classList.toggle('menu-open', offen);
+    $('scrim').hidden = !offen;
+    $('btn-menu').setAttribute('aria-expanded', offen ? 'true' : 'false');
+    document.body.style.overflow = offen && istMobil() ? 'hidden' : '';
+  }
+  function zeichnen() { (VIEWS[AKTUELL] || []).forEach(function (f) { f(); }); }
+  function zeige(id) {
+    id = ALIAS[id] || id; if (!VIEWS[id]) id = 'uebersicht';
+    var wechsel = id !== AKTUELL; AKTUELL = id;
+    var sec = $('v-' + id);
+    document.querySelectorAll('.view').forEach(function (v) { v.classList.toggle('active', v === sec); });
+    document.querySelectorAll('#nav a').forEach(function (a) { if (a.dataset.view === id) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+    $('view-title').textContent = sec.dataset.title;
+    document.title = sec.dataset.title + ' · Stromverbrauch';
+    menu(false);
+    if (wechsel) window.scrollTo(0, 0);
+    zeichnen();
+  }
+  $('btn-menu').addEventListener('click', function () { menu(!APP.classList.contains('menu-open')); });
+  $('scrim').addEventListener('click', function () { menu(false); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && APP.classList.contains('menu-open')) menu(false); });
+  document.querySelectorAll('#nav a').forEach(function (a) { a.addEventListener('click', function () { if (location.hash === '#' + a.dataset.view) zeige(a.dataset.view); }); });
+  $('btn-collapse').addEventListener('click', function () {
+    var zu = !APP.classList.contains('collapsed');
+    APP.classList.toggle('collapsed', zu);
+    try { localStorage.setItem('strom-menu-zu', zu ? '1' : '0'); } catch (e) { /* egal */ }
+    requestAnimationFrame(zeichnen);
+  });
+  try { if (localStorage.getItem('strom-menu-zu') === '1') APP.classList.add('collapsed'); } catch (e) { /* egal */ }
+  window.addEventListener('hashchange', function () { zeige(location.hash.slice(1)); });
+
   /* ---------- Start ---------- */
-  function drawCharts() { drawVerlauf(); drawSaison(); drawJahre(); updateSpiel(); }
   renderKopf();
   renderKpis();
   initSpielwiese();
   initDusche();
   initGeraet();
   initDisc();
-  renderAblesungen();
-  renderWerte();
+  initRechnerTabs();
+  renderDaten();
   renderVertraege();
   renderNotes();
-  drawVerlauf(); drawSaison(); drawJahre();
+  zeige(location.hash.slice(1) || 'uebersicht');
   var lastW = window.innerWidth, timer = null;
   window.addEventListener('resize', function () {
     if (window.innerWidth === lastW) return;
-    lastW = window.innerWidth; clearTimeout(timer); timer = setTimeout(drawCharts, 120);
+    lastW = window.innerWidth; clearTimeout(timer);
+    timer = setTimeout(function () { if (!istMobil()) menu(false); zeichnen(); }, 120);
   });
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', drawCharts);
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', zeichnen);
 })();
 </script>
 </body>
