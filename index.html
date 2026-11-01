@@ -803,7 +803,8 @@
     var sf = clear($('side-foot'));
     sf.appendChild(el('div', '', CUR.name + ' · ' + (CUR.kurz || '')));
     sf.appendChild(el('div', '', 'Stand ' + D.erzeugt.split(' ')[0].split('-').reverse().join('.')));
-    sf.appendChild(el('div', '', 'Neue Ablesung: Foto in den Ordner legen'));
+    if (D.offenLokal && D.offenLokal.length) sf.appendChild(el('div', '', 'Per Handy ergänzt, noch nicht in der Excel: ' + D.offenLokal.length));
+    sf.appendChild(el('div', '', 'Neue Ablesung: Foto in den Chat oder in den Ordner'));
   }
   function iconWarn() {
     var sv = s('svg', { width: 16, height: 16, viewBox: '0 0 16 16', 'aria-hidden': 'true' });

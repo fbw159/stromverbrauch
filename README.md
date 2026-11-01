@@ -8,6 +8,8 @@ Dashboard zum Stromverbrauch unserer Wohnung (Hufelandstraße, seit Mai 2025) mi
 - `index.html` – Dashboard (Kennzahlen, Verlauf, Saison- und Jahresvergleich, Kosten & Abschlag-Check,
   Spielwiese mit Tarif-, Dusch- und Geräte-Rechner sowie Zählerscheiben-Stoppuhr, Tabellen)
 - `messwerte.js` – Ablesungen, Verträge und Wohnungsdaten; wird automatisch aus der lokalen Excel-Datenbasis erzeugt
+  (unterwegs per Handy ergänzte Ablesungen stehen in `offenLokal`, bis sie in die Excel übernommen sind)
+- `tools/strom_update.py` – Update-Skript (Excel, messwerte.js, Veröffentlichung, Handy-Weg)
 
 Berechnung:
 
