@@ -1,10 +1,10 @@
 /*
  * Strom-Dashboard – Ablesungen, Verträge, Wohnungen
- * Automatisch erzeugt aus „Stromzaehlerwerte.xlsx“ am 01.11.2026 17:05.
- * Bitte nicht von Hand ändern: die Excel pflegen und _claude/strom_update.py ausführen.
+ * Stand 2026-11-06 09:50 (zuletzt per Dashboard-Eingabe geändert).
+ * Datenbasis ist die Excel auf dem PC; online eingetragene Ablesungen stehen in offenLokal, bis sie übernommen sind.
  */
 window.STROM = {
- "erzeugt": "2026-11-01 17:05",
+ "erzeugt": "2026-11-06 09:50",
  "quelle": "Stromzaehlerwerte.xlsx",
  "wohnungen": [
   {
@@ -33,84 +33,84 @@ window.STROM = {
  "ablesungen": [
   {
    "datum": "2021-08-04",
-   "stand": 18764.0,
+   "stand": 18764,
    "wohnung": "Robert-Koch-Straße",
    "quelle": "Excel „Zählerstände_Robert-Koch_Str.“",
    "bemerkung": ""
   },
   {
    "datum": "2021-12-31",
-   "stand": 19766.0,
+   "stand": 19766,
    "wohnung": "Robert-Koch-Straße",
    "quelle": "Excel „Zählerstände_Robert-Koch_Str.“",
    "bemerkung": ""
   },
   {
    "datum": "2022-03-02",
-   "stand": 20174.0,
+   "stand": 20174,
    "wohnung": "Robert-Koch-Straße",
    "quelle": "Excel „Zählerstände_Robert-Koch_Str.“",
    "bemerkung": ""
   },
   {
    "datum": "2022-03-03",
-   "stand": 20174.0,
+   "stand": 20174,
    "wohnung": "Robert-Koch-Straße",
    "quelle": "Excel „Zählerstände_Robert-Koch_Str.“",
    "bemerkung": "gleicher Stand wie am Vortag – vermutlich doppelt erfasst"
   },
   {
    "datum": "2022-03-31",
-   "stand": 20398.0,
+   "stand": 20398,
    "wohnung": "Robert-Koch-Straße",
    "quelle": "Excel „Zählerstände_Robert-Koch_Str.“",
    "bemerkung": ""
   },
   {
    "datum": "2022-06-30",
-   "stand": 21100.0,
+   "stand": 21100,
    "wohnung": "Robert-Koch-Straße",
    "quelle": "Excel „Zählerstände_Robert-Koch_Str.“",
    "bemerkung": ""
   },
   {
    "datum": "2022-12-31",
-   "stand": 22521.0,
+   "stand": 22521,
    "wohnung": "Robert-Koch-Straße",
    "quelle": "Excel „Zählerstände_Robert-Koch_Str.“",
    "bemerkung": ""
   },
   {
    "datum": "2023-03-03",
-   "stand": 23000.0,
+   "stand": 23000,
    "wohnung": "Robert-Koch-Straße",
    "quelle": "Excel „Zählerstände_Robert-Koch_Str.“",
    "bemerkung": ""
   },
   {
    "datum": "2023-07-21",
-   "stand": 23994.0,
+   "stand": 23994,
    "wohnung": "Robert-Koch-Straße",
    "quelle": "Excel „Zählerstände_Robert-Koch_Str.“",
    "bemerkung": ""
   },
   {
    "datum": "2023-08-31",
-   "stand": 24398.0,
+   "stand": 24398,
    "wohnung": "Robert-Koch-Straße",
    "quelle": "Excel „Zählerstände_Robert-Koch_Str.“",
    "bemerkung": ""
   },
   {
    "datum": "2024-09-01",
-   "stand": 27106.0,
+   "stand": 27106,
    "wohnung": "Robert-Koch-Straße",
    "quelle": "Excel „Zählerstände_Robert-Koch_Str.“",
    "bemerkung": "letzter Wert der alten Wohnung"
   },
   {
    "datum": "2026-04-24",
-   "stand": 58603.0,
+   "stand": 58603,
    "wohnung": "Hufelandstraße",
    "quelle": "SWDU – Bestätigung Zählerstanderfassung",
    "bemerkung": "eigene Ablesung, an SWDU gemeldet (zur Kündigung)"
@@ -128,6 +128,13 @@ window.STROM = {
    "wohnung": "Hufelandstraße",
    "quelle": "Foto IMG_20261101_131144.jpg (13:11 Uhr)",
    "bemerkung": ""
+  },
+  {
+   "datum": "2026-11-06",
+   "stand": 60300,
+   "wohnung": "Hufelandstraße",
+   "quelle": "Eingabe im Dashboard",
+   "bemerkung": ""
   }
  ],
  "vertraege": [
@@ -142,7 +149,7 @@ window.STROM = {
    "gpJahr": 113.45,
    "gpAngabe": 113.45,
    "gpEinheit": "€/Jahr",
-   "abschlag": 76.0,
+   "abschlag": 76,
    "abschlagFaellig": "monatlich zum 20.",
    "preisgarantieBis": "2026-05-31",
    "laufzeit": "12 Monate, danach unbefristet; Kündigungsfrist 1 Monat",
@@ -160,7 +167,7 @@ window.STROM = {
    "gpJahr": 92.88,
    "gpAngabe": 7.74,
    "gpEinheit": "€/Monat",
-   "abschlag": 60.0,
+   "abschlag": 60,
    "abschlagFaellig": "monatlich zum 1.",
    "preisgarantieBis": "2027-11-30",
    "laufzeit": "12 Monate, kündbar zum 31.05.2027 (Frist 1 Monat); Preisgarantie 18 Monate, danach 102 Monate Energiepreis-Garantie",
@@ -187,5 +194,8 @@ window.STROM = {
    "status": "nicht wirksam geworden (gekündigt) – zeigt, was ohne Wechsel fällig gewesen wäre",
    "quelle": "SWDU: Preisanpassung durch Kostenänderung 16.04.2026"
   }
+ ],
+ "offenLokal": [
+  "2026-11-06"
  ]
 };
