@@ -1041,23 +1041,19 @@ def messwerte_js(d: dict) -> str:
 
 README = f"""# Stromverbrauch
 
-Dashboard zum Stromverbrauch unserer Wohnung (Hufelandstraße, seit Mai 2025) mit Vergleich zur alten Wohnung
-(Robert-Koch-Straße, Ablesungen 2021–2024). Beide Wohnungen: 2 Personen, Fernwärme, Warmwasser per Durchlauferhitzer.
+Einfaches Dashboard zum Stromverbrauch unserer Wohnung (Hufelandstraße, seit Mai 2025) mit den Werten der alten Wohnung
+(Robert-Koch-Straße, 2021–2024) zum Vergleich: Zählerstand eintragen, geschätzter Jahresverbrauch, zwei Diagramme, Historie.
 
-**Live:** {PAGES_URL}
+**Live:** {PAGES_URL} (Eintragen nur mit dem persönlichen Link)
 
-- `index.html` – Dashboard (Kennzahlen, Verlauf, Saison- und Jahresvergleich, Kosten & Abschlag-Check,
-  Spielwiese mit Tarif-, Dusch- und Geräte-Rechner sowie Zählerscheiben-Stoppuhr, Tabellen)
-- `messwerte.js` – Ablesungen, Verträge und Wohnungsdaten; wird automatisch aus der lokalen Excel-Datenbasis erzeugt
-  (unterwegs per Handy ergänzte Ablesungen stehen in `offenLokal`, bis sie in die Excel übernommen sind)
+- `index.html` – Dashboard
+- `messwerte.js` – Ablesungen; wird aus der lokalen Excel-Datenbasis erzeugt. Im Dashboard oder per Handy eingetragene
+  Ablesungen stehen in `offenLokal`, bis sie in die Excel übernommen sind.
+- `relay/worker.js` – Cloudflare Worker, der Eingaben aus dem Dashboard speichert
 - `tools/strom_update.py` – Update-Skript (Excel, messwerte.js, Veröffentlichung, Handy-Weg)
 
-Berechnung:
-
-- Verbrauch je Ableseintervall = Differenz der Zählerstände, Ø kWh/Tag = Verbrauch / Tage, Hochrechnung = Ø × 365
-- Monats- und Jahreswerte: Zählerstände linear zwischen den Ablesungen interpoliert
-- Kosten = Verbrauch × Arbeitspreis + Tage × Grundpreis/365 (Preise brutto laut Vertrag)
-- Prognose Abrechnungsjahr = gemessener Verbrauch seit Lieferbeginn + Ø kWh/Tag × Resttage
+Berechnung: Verbrauch pro Tag = Differenz zweier Zählerstände / Tage; geschätzter Jahresverbrauch = Ø pro Tag × 365;
+Jahreswerte linear zwischen den Ablesungen interpoliert, angefangene Jahre hochgerechnet.
 """
 
 
