@@ -128,13 +128,6 @@ window.STROM = {
    "wohnung": "Hufelandstraße",
    "quelle": "Foto IMG_20261101_131144.jpg (13:11 Uhr)",
    "bemerkung": ""
-  },
-  {
-   "datum": "2026-11-06",
-   "stand": 60300,
-   "wohnung": "Hufelandstraße",
-   "quelle": "Eingabe im Dashboard",
-   "bemerkung": ""
   }
  ],
  "vertraege": [
@@ -195,7 +188,5 @@ window.STROM = {
    "quelle": "SWDU: Preisanpassung durch Kostenänderung 16.04.2026"
   }
  ],
- "offenLokal": [
-  "2026-11-06"
- ]
+ "offenLokal": []
 };
